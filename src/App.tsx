@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AppProvider, useApp } from "@/contexts/AppContext";
 import { Layout } from "@/components/layout/Layout";
+import { ScrollToTop } from "@/components/ScrollToTop";
 
 // Pages
 import { Landing } from "@/pages/Landing";
@@ -65,6 +66,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ScrollToTop />
           <AppRoutes />
         </BrowserRouter>
       </AppProvider>
