@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Mail, Target } from 'lucide-react';
+import { ArrowLeft, Mail, Target, Home } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -42,6 +42,17 @@ export const ForgotPassword: React.FC = () => {
   if (isSubmitted) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-secondary/30 flex items-center justify-center p-4">
+        {/* Back to Home Button */}
+        <Link 
+          to="/" 
+          className="fixed top-6 left-6 z-10 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group"
+        >
+          <div className="p-2 rounded-lg bg-background/80 backdrop-blur-sm border border-border group-hover:bg-background transition-colors">
+            <Home className="w-4 h-4" />
+          </div>
+          <span className="hidden sm:inline text-sm font-medium">Back to Home</span>
+        </Link>
+
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -91,6 +102,17 @@ export const ForgotPassword: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-secondary/30 flex items-center justify-center p-4">
+      {/* Back to Home Button */}
+      <Link 
+        to="/" 
+        className="fixed top-6 left-6 z-10 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group"
+      >
+        <div className="p-2 rounded-lg bg-background/80 backdrop-blur-sm border border-border group-hover:bg-background transition-colors">
+          <Home className="w-4 h-4" />
+        </div>
+        <span className="hidden sm:inline text-sm font-medium">Back to Home</span>
+      </Link>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -107,7 +129,7 @@ export const ForgotPassword: React.FC = () => {
           >
             <Target className="w-8 h-8 text-white" />
           </motion.div>
-          <h1 className="text-2xl font-bold text-card-foreground">Smart To-Do</h1>
+          <h1 className="text-2xl font-bold text-card-foreground">TaskFlow</h1>
           <p className="text-muted-foreground mt-2">Intelligent task management</p>
         </div>
 
