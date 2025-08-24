@@ -1,0 +1,171 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL - Cobalt Blue Theme
+Smart To-Do Scheduler Design System with Poppins typography and cobalt blue branding
+*/
+
+@layer base {
+  :root {
+    /* Base colors - clean white backgrounds */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+
+    /* Card and surface colors */
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    /* Primary brand colors - Cobalt Blue */
+    --primary: 220 91% 54%;               /* Cobalt Blue #1d4ed8 */
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 220 91% 45%;
+    
+    /* Secondary colors - light gray */
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --secondary-hover: 210 40% 92%;
+
+    /* Muted backgrounds */
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+
+    /* Accent colors */
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
+
+    /* Status colors for priorities - no yellow */
+    --priority-high: 0 84% 60%;           /* Red for high priority */
+    --priority-high-foreground: 0 0% 100%;
+    --priority-medium: 25 95% 53%;        /* Orange for medium priority */
+    --priority-medium-foreground: 0 0% 100%;
+    --priority-low: 142 76% 36%;          /* Green for low priority */
+    --priority-low-foreground: 0 0% 100%;
+    
+    /* Success and completion */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    
+    /* Warning and pending - orange instead of yellow */
+    --warning: 25 95% 53%;
+    --warning-foreground: 0 0% 100%;
+    
+    /* Destructive actions */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Border and input styles */
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 220 91% 54%;
+
+    /* Gradients - Cobalt Blue based */
+    --gradient-primary: linear-gradient(135deg, hsl(220 91% 54%), hsl(220 91% 45%));
+    --gradient-secondary: linear-gradient(135deg, hsl(210 40% 96%), hsl(210 40% 92%));
+    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 30%));
+    
+    /* Shadows with cobalt blue tint */
+    --shadow-sm: 0 1px 2px 0 hsl(220 91% 54% / 0.1);
+    --shadow-md: 0 4px 6px -1px hsl(220 91% 54% / 0.1), 0 2px 4px -1px hsl(220 91% 54% / 0.06);
+    --shadow-lg: 0 10px 15px -3px hsl(220 91% 54% / 0.1), 0 4px 6px -2px hsl(220 91% 54% / 0.05);
+    --shadow-glow: 0 0 20px hsl(220 91% 54% / 0.4);
+    
+    --radius: 12px;
+
+    /* Sidebar colors */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 220 91% 54%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 40% 96%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 214 32% 91%;
+    --sidebar-ring: 220 91% 54%;
+  }
+
+  .dark {
+    --background: 222 84% 5%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 84% 5%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 84% 5%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 220 91% 54%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 220 91% 45%;
+
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --secondary-hover: 217 33% 22%;
+
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 217 33% 17%;
+    --accent-foreground: 210 40% 98%;
+
+    --priority-high: 0 84% 60%;
+    --priority-high-foreground: 0 0% 100%;
+    --priority-medium: 25 95% 53%;
+    --priority-medium-foreground: 0 0% 100%;
+    --priority-low: 142 76% 36%;
+    --priority-low-foreground: 0 0% 100%;
+
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 25 95% 53%;
+    --warning-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 220 91% 54%;
+    
+    --sidebar-background: 222 84% 5%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 220 91% 54%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 217 33% 17%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 33% 17%;
+    --sidebar-ring: 220 91% 54%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-poppins antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-muted;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/30 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+  }
+}
