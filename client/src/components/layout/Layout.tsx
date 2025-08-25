@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/hooks/useApp';
 
 interface LayoutProps {
   children: React.ReactNode;

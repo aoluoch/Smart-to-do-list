@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Bell, Settings, User, LogOut, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/hooks/useApp';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {

@@ -12,7 +12,7 @@ import {
   ChevronRight,
   Target
 } from 'lucide-react';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/hooks/useApp';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 

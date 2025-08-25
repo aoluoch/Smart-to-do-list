@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Clock, AlertTriangle } from 'lucide-react';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/hooks/useApp';
 import { Task } from '@/types';
 import {
   Dialog,

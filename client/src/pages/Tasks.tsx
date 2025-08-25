@@ -12,7 +12,7 @@ import {
   Trash2,
   AlertTriangle
 } from 'lucide-react';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/hooks/useApp';
 import { Task } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

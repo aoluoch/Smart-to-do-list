@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { GitBranch, List, Network, AlertTriangle, CheckSquare, Clock } from 'lucide-react';
-import { useApp } from '@/contexts/AppContext';
+import { useApp } from '@/hooks/useApp';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
