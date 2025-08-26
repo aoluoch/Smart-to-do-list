@@ -33,16 +33,28 @@ export const Analytics: React.FC = () => {
     { name: 'Overdue', value: stats.overdue, color: COLORS.overdue },
   ].filter(item => item.value > 0);
 
-  // Velocity data (mock data for demonstration)
-  const velocityData = [
-    { day: 'Mon', completed: 3 },
-    { day: 'Tue', completed: 5 },
-    { day: 'Wed', completed: 2 },
-    { day: 'Thu', completed: 4 },
-    { day: 'Fri', completed: 6 },
-    { day: 'Sat', completed: 1 },
-    { day: 'Sun', completed: 2 },
-  ];
+  // Velocity data - calculate from actual task completion data
+  const velocityData = React.useMemo(() => {
+    const last7Days = Array.from({ length: 7 }, (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() - (6 - i));
+      return date;
+    });
+
+    return last7Days.map(date => {
+      const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+      const completedTasks = tasks.filter(task => {
+        if (!task.completedAt) return false;
+        const completedDate = new Date(task.completedAt);
+        return completedDate.toDateString() === date.toDateString();
+      }).length;
+
+      return {
+        day: dayName,
+        completed: completedTasks,
+      };
+    });
+  }, [tasks]);
 
   // Task duration distribution
   const durationData = [
