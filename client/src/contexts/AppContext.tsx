@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, Task, Notification, TaskStats } from '@/types';
 import { mockUser, mockTasks, mockNotifications } from '@/data/mockData';
 
-interface AppContextType {
+export interface AppContextType {
   // Authentication
   user: User | null;
   isAuthenticated: boolean;
@@ -29,7 +29,7 @@ interface AppContextType {
   setSidebarOpen: (open: boolean) => void;
 }
 
-const AppContext = createContext<AppContextType | undefined>(undefined);
+export const AppContext = createContext<AppContextType | undefined>(undefined);
 
 // useApp hook moved to @/hooks/useApp.ts
 
