@@ -22,16 +22,25 @@ export const ForgotPassword: React.FC = () => {
     setIsLoading(true);
     setError('');
 
-    // Mock password reset
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      setIsSubmitted(true);
-      toast({
-        title: 'Reset link sent!',
-        description: 'Check your email for password reset instructions.',
+      // TODO: Replace with actual API call to backend
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
       });
+
+      if (response.ok) {
+        setIsSubmitted(true);
+        toast({
+          title: 'Reset link sent!',
+          description: 'Check your email for password reset instructions.',
+        });
+      } else {
+        throw new Error('Failed to send reset email');
+      }
     } catch (err) {
       setError('Failed to send reset email. Please try again.');
     } finally {

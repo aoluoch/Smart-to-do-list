@@ -35,7 +35,7 @@ export const Login: React.FC = () => {
         });
         navigate('/dashboard');
       } else {
-        setError('Invalid email or password. Try: alex.johnson@example.com / password');
+        setError('Invalid email or password. Please check your credentials.');
       }
     } catch (err) {
       setError('An error occurred during login');
@@ -97,7 +97,7 @@ export const Login: React.FC = () => {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="alex.johnson@example.com"
+                  placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -157,14 +157,7 @@ export const Login: React.FC = () => {
               </p>
             </div>
 
-            {/* Demo credentials hint */}
-            <div className="mt-6 p-3 bg-muted rounded-lg">
-              <p className="text-xs text-muted-foreground text-center">
-                <strong>Demo credentials:</strong><br />
-                Email: alex.johnson@example.com<br />
-                Password: password
-              </p>
-            </div>
+
           </CardContent>
         </Card>
       </motion.div>

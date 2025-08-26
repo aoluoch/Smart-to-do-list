@@ -32,7 +32,7 @@ export const Dependencies: React.FC = () => {
     return { nodes, edges };
   };
 
-  // Find critical path (mock implementation)
+  // Find critical path
   const findCriticalPath = () => {
     // Simple critical path detection based on dependency chains
     const dependencyChains: string[][] = [];

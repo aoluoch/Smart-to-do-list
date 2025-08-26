@@ -35,40 +35,162 @@ export const Settings: React.FC = () => {
     defaultTaskDuration: 60,
   });
 
-  const handleProfileSave = () => {
-    // Mock save functionality
-    toast({
-      title: 'Profile updated',
-      description: 'Your profile settings have been saved successfully.',
-    });
+  const handleProfileSave = async () => {
+    try {
+      // TODO: Replace with actual API call to backend
+      const response = await fetch('/api/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(profile),
+      });
+
+      if (response.ok) {
+        toast({
+          title: 'Profile updated',
+          description: 'Your profile settings have been saved successfully.',
+        });
+      } else {
+        throw new Error('Failed to update profile');
+      }
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to update profile. Please try again.',
+        variant: 'destructive',
+      });
+    }
   };
 
-  const handleNotificationSave = () => {
-    toast({
-      title: 'Notification settings updated',
-      description: 'Your notification preferences have been saved.',
-    });
+  const handleNotificationSave = async () => {
+    try {
+      // TODO: Replace with actual API call to backend
+      const response = await fetch('/api/user/notifications', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(notifications),
+      });
+
+      if (response.ok) {
+        toast({
+          title: 'Notification settings updated',
+          description: 'Your notification preferences have been saved.',
+        });
+      } else {
+        throw new Error('Failed to update notification settings');
+      }
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to update notification settings. Please try again.',
+        variant: 'destructive',
+      });
+    }
   };
 
-  const handlePreferencesSave = () => {
-    toast({
-      title: 'Preferences updated',
-      description: 'Your preferences have been saved successfully.',
-    });
+  const handlePreferencesSave = async () => {
+    try {
+      // TODO: Replace with actual API call to backend
+      const response = await fetch('/api/user/preferences', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(preferences),
+      });
+
+      if (response.ok) {
+        toast({
+          title: 'Preferences updated',
+          description: 'Your preferences have been saved successfully.',
+        });
+      } else {
+        throw new Error('Failed to update preferences');
+      }
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to update preferences. Please try again.',
+        variant: 'destructive',
+      });
+    }
   };
 
-  const handleExportData = () => {
-    toast({
-      title: 'Data exported',
-      description: 'Your data has been exported to CSV format.',
-    });
+  const handleExportData = async () => {
+    try {
+      // TODO: Replace with actual API call to backend
+      const response = await fetch('/api/user/export', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'todo-data.csv';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+        toast({
+          title: 'Data exported',
+          description: 'Your data has been exported to CSV format.',
+        });
+      } else {
+        throw new Error('Failed to export data');
+      }
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to export data. Please try again.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const handleImportData = () => {
-    toast({
-      title: 'Data imported',
-      description: 'Your data has been imported successfully.',
-    });
+    // TODO: Implement file picker and API call to backend
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.csv';
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+          const response = await fetch('/api/user/import', {
+            method: 'POST',
+            body: formData,
+          });
+
+          if (response.ok) {
+            toast({
+              title: 'Data imported',
+              description: 'Your data has been imported successfully.',
+            });
+          } else {
+            throw new Error('Failed to import data');
+          }
+        } catch (error) {
+          toast({
+            title: 'Error',
+            description: 'Failed to import data. Please try again.',
+            variant: 'destructive',
+          });
+        }
+      }
+    };
+    input.click();
   };
 
   const SettingsSection: React.FC<{

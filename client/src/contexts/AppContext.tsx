@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, Task, Notification, TaskStats } from '@/types';
-import { mockUser, mockTasks, mockNotifications } from '@/data/mockData';
 
 export interface AppContextType {
   // Authentication
@@ -36,47 +35,86 @@ export const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [tasks, setTasks] = useState<Task[]>(mockTasks);
-  const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => {
-    // Check if user is already logged in (mock)
+    // Check if user is already logged in
     const savedAuth = localStorage.getItem('todoapp_auth');
-    if (savedAuth) {
-      setUser(mockUser);
-      setIsAuthenticated(true);
+    const savedUser = localStorage.getItem('todoapp_user');
+    if (savedAuth && savedUser) {
+      try {
+        const userData = JSON.parse(savedUser);
+        setUser(userData);
+        setIsAuthenticated(true);
+      } catch (error) {
+        // Clear invalid data
+        localStorage.removeItem('todoapp_auth');
+        localStorage.removeItem('todoapp_user');
+      }
     }
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    // Mock authentication
-    if (email === mockUser.email && password === 'password') {
-      setUser(mockUser);
-      setIsAuthenticated(true);
-      localStorage.setItem('todoapp_auth', 'true');
-      return true;
+    try {
+      // TODO: Replace with actual API call to backend
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data.user);
+        setIsAuthenticated(true);
+        localStorage.setItem('todoapp_auth', 'true');
+        localStorage.setItem('todoapp_user', JSON.stringify(data.user));
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Login error:', error);
+      return false;
     }
-    return false;
   };
 
   const register = async (username: string, email: string, password: string): Promise<boolean> => {
-    // Mock registration
-    const newUser: User = {
-      ...mockUser,
-      username,
-      email,
-    };
-    setUser(newUser);
-    setIsAuthenticated(true);
-    localStorage.setItem('todoapp_auth', 'true');
-    return true;
+    try {
+      // TODO: Replace with actual API call to backend
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, email, password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data.user);
+        setIsAuthenticated(true);
+        localStorage.setItem('todoapp_auth', 'true');
+        localStorage.setItem('todoapp_user', JSON.stringify(data.user));
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Registration error:', error);
+      return false;
+    }
   };
 
   const logout = () => {
     setUser(null);
     setIsAuthenticated(false);
+    setTasks([]);
+    setNotifications([]);
     localStorage.removeItem('todoapp_auth');
+    localStorage.removeItem('todoapp_user');
   };
 
   const addTask = (taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
