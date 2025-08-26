@@ -38,46 +38,104 @@ def drop_database():
             return False
 
 
-def create_sample_user():
-    """Create sample user for testing"""
-    print("Creating sample user...")
-    
+def create_sample_users():
+    """Create multiple sample users for testing"""
+    print("Creating sample users...")
+
     with app.app_context():
         try:
-            # Check if user already exists
-            existing_user = User.query.filter_by(email='alex.johnson@example.com').first()
-            if existing_user:
-                print("Sample user already exists")
-                return existing_user
-            
-            # Create sample user
-            user = User(
-                id='sample-user-1',
-                username='Alex Johnson',
-                email='alex.johnson@example.com',
-                work_capacity=8,
-                email_reminders=True
-            )
-            user.set_password('password')
-            
-            db.session.add(user)
+            sample_users_data = [
+                {
+                    'id': 'sample-user-1',
+                    'username': 'Alex Johnson',
+                    'email': 'alex.johnson@example.com',
+                    'work_capacity': 8,
+                    'email_reminders': True
+                },
+                {
+                    'id': 'sample-user-2',
+                    'username': 'Sarah Chen',
+                    'email': 'sarah.chen@example.com',
+                    'work_capacity': 6,
+                    'email_reminders': True
+                },
+                {
+                    'id': 'sample-user-3',
+                    'username': 'Mike Rodriguez',
+                    'email': 'mike.rodriguez@example.com',
+                    'work_capacity': 7,
+                    'email_reminders': False
+                },
+                {
+                    'id': 'sample-user-4',
+                    'username': 'Emma Thompson',
+                    'email': 'emma.thompson@example.com',
+                    'work_capacity': 8,
+                    'email_reminders': True
+                },
+                {
+                    'id': 'sample-user-5',
+                    'username': 'David Kim',
+                    'email': 'david.kim@example.com',
+                    'work_capacity': 5,
+                    'email_reminders': False
+                }
+            ]
+
+            created_user_ids = []
+            for user_data in sample_users_data:
+                # Check if user already exists
+                existing_user = User.query.filter_by(email=user_data['email']).first()
+                if existing_user:
+                    print(f"User already exists: {user_data['email']}")
+                    created_user_ids.append(existing_user.id)
+                    continue
+
+                # Create new user
+                user = User(
+                    id=user_data['id'],
+                    username=user_data['username'],
+                    email=user_data['email'],
+                    work_capacity=user_data['work_capacity'],
+                    email_reminders=user_data['email_reminders']
+                )
+                user.set_password('password')  # Same password for all users for easy testing
+
+                db.session.add(user)
+                created_user_ids.append(user_data['id'])
+                print(f"✅ Sample user created: {user_data['email']}")
+
             db.session.commit()
-            
-            print(f"✅ Sample user created: {user.email}")
-            return user
-            
+            print(f"✅ Total users available: {len(created_user_ids)}")
+            return created_user_ids
+
         except Exception as e:
-            print(f"❌ Error creating sample user: {e}")
+            print(f"❌ Error creating sample users: {e}")
             db.session.rollback()
-            return None
+            return []
 
 
-def create_sample_tasks(user):
+def create_sample_user():
+    """Create sample user for testing (backward compatibility)"""
+    user_ids = create_sample_users()
+    if user_ids:
+        with app.app_context():
+            return User.query.get(user_ids[0])
+    return None
+
+
+def create_sample_tasks(user_id):
     """Create sample tasks for testing"""
     print("Creating sample tasks...")
-    
+
     with app.app_context():
         try:
+            # Get user from database
+            user = User.query.get(user_id)
+            if not user:
+                print("❌ User not found in current session")
+                return
+
             # Check if tasks already exist
             existing_tasks = Task.query.filter_by(user_id=user.id).count()
             if existing_tasks > 0:
@@ -217,12 +275,18 @@ def create_sample_tasks(user):
             db.session.rollback()
 
 
-def create_sample_notifications(user):
+def create_sample_notifications(user_id):
     """Create sample notifications for testing"""
     print("Creating sample notifications...")
-    
+
     with app.app_context():
         try:
+            # Get user from database
+            user = User.query.get(user_id)
+            if not user:
+                print("❌ User not found in current session")
+                return
+
             # Check if notifications already exist
             existing_notifications = Notification.query.filter_by(user_id=user.id).count()
             if existing_notifications > 0:
@@ -310,27 +374,29 @@ def main():
         print("Resetting database...")
         drop_database()
         create_database()
-        
+
         # Create sample data
-        user = create_sample_user()
-        if user:
-            create_sample_tasks(user)
-            create_sample_notifications(user)
-        
+        user_ids = create_sample_users()
+        if user_ids:
+            # Create tasks and notifications for the first user (Alex Johnson)
+            create_sample_tasks(user_ids[0])
+            create_sample_notifications(user_ids[0])
+
         print("Database reset completed")
-    
+
     elif command == 'init':
         print("Initializing database...")
-        
+
         if create_database():
             # Create sample data for development
             if os.getenv('FLASK_ENV') == 'development':
-                user = create_sample_user()
-                if user:
-                    create_sample_tasks(user)
-                    create_sample_notifications(user)
+                user_ids = create_sample_users()
+                if user_ids:
+                    # Create tasks and notifications for the first user (Alex Johnson)
+                    create_sample_tasks(user_ids[0])
+                    create_sample_notifications(user_ids[0])
                 print("Sample data created for development")
-            
+
             print("Database initialization completed successfully")
         else:
             print("Database initialization failed")
