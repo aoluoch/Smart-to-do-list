@@ -128,7 +128,7 @@ export const Landing: React.FC = () => {
                 onClick={() => navigate('/register')}
                 className="bg-gradient-primary text-white hover:opacity-90 text-lg px-8 py-3"
               >
-                Start Free Trial
+                Sign Up
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
               <Button 
