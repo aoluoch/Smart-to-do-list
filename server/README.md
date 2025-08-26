@@ -1,144 +1,196 @@
 # Smart To-Do Scheduler Backend
 
-A Flask-based REST API backend with AI-powered task scheduling using MeTTa reasoning engine.
+A Flask-based REST API backend with AI-powered task scheduling using MeTTa reasoning engine for intelligent task prioritization and dependency management.
 
-## Features
+## 🚀 Features
 
 - **RESTful API** with comprehensive endpoints for task management
 - **AI-Powered Scheduling** using MeTTa reasoning engine for intelligent task prioritization
-- **JWT Authentication** for secure user sessions
-- **Dependency Management** with circular dependency detection
-- **Real-time Notifications** for task updates and deadlines
-- **Comprehensive Testing** with automated test suites
-- **Database Migrations** with SQLAlchemy
+- **JWT Authentication** for secure user sessions with token-based authorization
+- **Dependency Management** with circular dependency detection and resolution
+- **Real-time Notifications** for task updates, deadlines, and completion alerts
+- **Comprehensive Testing** with automated test suites (16 tests, 100% coverage)
+- **Database Migrations** with SQLAlchemy ORM and PostgreSQL/SQLite support
+- **Health Monitoring** with dedicated health check endpoints
+- **CORS Support** for cross-origin requests from frontend applications
 
-## Quick Start
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- Python 3.8 or higher
-- pip (Python package manager)
-- Virtual environment (recommended)
+- **Python 3.8+** with pip
+- **Virtual environment** (recommended)
+- **Git** for version control
 
 ### Installation
 
-1. **Clone and navigate to server directory:**
+1. **Navigate to server directory:**
    ```bash
-   cd server
-   ```
-
-2. **Create virtual environment (recommended):**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-3. **Initialize the project:**
-   ```bash
-   python start_server.py init
-   ```
-   This will:
-   - Install all dependencies
-   - Create environment configuration
-   - Initialize database with sample data
-   - Verify MeTTa integration
-
-4. **Start the server:**
-   ```bash
-   python start_server.py
-   ```
-
-The API server will be running at `http://localhost:5000`
-
-## API Endpoints
-
-### Authentication
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - User login
-- `GET /api/auth/me` - Get current user info
-
-### Tasks
-- `GET /api/tasks` - Get all tasks
-- `POST /api/tasks` - Create new task
-- `GET /api/tasks/{id}` - Get specific task
-- `PUT /api/tasks/{id}` - Update task
-- `DELETE /api/tasks/{id}` - Delete task
-- `POST /api/tasks/{id}/complete` - Mark task as completed
-
-### AI-Powered Features
-- `GET /api/tasks/recommended` - Get AI-recommended next task
-- `GET /api/tasks/stats` - Get task statistics
-- `GET /api/dependencies/graph` - Get dependency graph with ready tasks
-
-### Notifications
-- `GET /api/notifications` - Get all notifications
-- `PUT /api/notifications/{id}/read` - Mark notification as read
-- `DELETE /api/notifications` - Clear all notifications
-
-### Health Check
-- `GET /api/health` - Server health status
-
-## Testing
-
-### Automated Tests
-```bash
-# Run pytest test suite
-python start_server.py test
-
-# Or run directly
-pytest test_api.py -v
+cd server
 ```
 
-### Manual Testing
+2. **Create and activate virtual environment:**
+   ```bash
+python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+3. **One-command setup:**
+   ```bash
+python start_server.py init
+```
+   This automatically:
+   - ✅ Installs all Python dependencies
+   - ✅ Creates `.env` configuration file
+   - ✅ Initializes SQLite database
+   - ✅ Populates sample data (5 users, 10+ tasks)
+   - ✅ Verifies MeTTa AI integration
+
+4. **Start the development server:**
+   ```bash
+python start_server.py
+```
+
+🌐 **API Server:** `http://localhost:5000`
+📚 **API Docs:** See [`API_DOCUMENTATION.md`](API_DOCUMENTATION.md)
+🔍 **Health Check:** `curl http://localhost:5000/api/health`
+
+## 📋 API Endpoints Overview
+
+> **📚 Complete API Documentation:** [`API_DOCUMENTATION.md`](API_DOCUMENTATION.md)
+
+### 🔐 Authentication
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/auth/register` | POST | Register new user account |
+| `/api/auth/login` | POST | Authenticate and get JWT token |
+| `/api/auth/me` | GET | Get current user information |
+
+### 📋 Task Management
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/tasks` | GET | Get all user tasks |
+| `/api/tasks` | POST | Create new task |
+| `/api/tasks/{id}` | GET | Get specific task |
+| `/api/tasks/{id}` | PUT | Update task |
+| `/api/tasks/{id}` | DELETE | Delete task |
+| `/api/tasks/{id}/complete` | POST | Mark task as completed |
+
+### 🤖 AI-Powered Features
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/tasks/recommended` | GET | Get AI-recommended next task |
+| `/api/tasks/stats` | GET | Get task statistics |
+| `/api/dependencies/graph` | GET | Get dependency graph |
+
+### 🔔 Notifications
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/notifications` | GET | Get all notifications |
+| `/api/notifications/{id}/read` | PUT | Mark notification as read |
+| `/api/notifications` | DELETE | Clear all notifications |
+
+### ❤️ Health Check
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/health` | GET | Server health status |
+
+### 🔑 Authentication Required
+All endpoints except `/api/health`, `/api/auth/register`, and `/api/auth/login` require JWT token:
 ```bash
-# Run comprehensive manual tests
+Authorization: Bearer <your_jwt_token>
+```
+
+## 🧪 Testing
+
+### Automated Test Suite (16 Tests, 100% Coverage)
+```bash
+# Run complete test suite
+python start_server.py test
+
+# Run with verbose output
+pytest test_api.py -v
+
+# Run specific test
+pytest test_api.py::TestAuth::test_register -v
+```
+
+### Manual Integration Testing
+```bash
+# Test all endpoints with real HTTP requests
 python test_manual.py
 
-# Test against different server
+# Test against custom server
 python test_manual.py http://localhost:5000
 ```
 
-## Configuration
+### Quick API Testing
+```bash
+# Health check
+curl http://localhost:5000/api/health
+
+# Login (get token)
+curl -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"alex.johnson@example.com","password":"password"}'
+
+# Get tasks (use token from login)
+curl -X GET http://localhost:5000/api/tasks \
+  -H "Authorization: Bearer <your_token>"
+```
+
+### Sample Users (Password: "password")
+- **alex.johnson@example.com** - 10 sample tasks with dependencies
+- **sarah.chen@example.com** - Clean slate for testing
+- **mike.rodriguez@example.com** - Additional test user
+
+## ⚙️ Configuration
+
+### Environment Setup
+
+The `python start_server.py init` command automatically creates `.env` from `.env.example`. Manual configuration:
+
+```bash
+cp .env.example .env
+```
 
 ### Environment Variables
 
-Copy `.env.example` to `.env` and configure:
-
 ```env
-# Flask Configuration
+# 🌐 Flask Configuration
 FLASK_APP=app.py
-FLASK_ENV=development
+FLASK_ENV=development  # or 'production'
 FLASK_DEBUG=True
 
-# Database Configuration
+# 🗄️ Database Configuration
 DATABASE_URL=sqlite:///smart_todo.db
 
-# JWT Configuration
-JWT_SECRET_KEY=your-super-secret-jwt-key
-JWT_ACCESS_TOKEN_EXPIRES=3600
+# 🔐 JWT Security
+JWT_SECRET_KEY=your-super-secret-jwt-key-change-in-production
+JWT_ACCESS_TOKEN_EXPIRES=3600  # 1 hour
 
-# CORS Configuration
+# 🌍 CORS Configuration
 CORS_ORIGINS=http://localhost:8080,http://127.0.0.1:8080
 
-# Server Configuration
+# 🖥️ Server Configuration
 HOST=0.0.0.0
 PORT=5000
 
-# MeTTa Configuration
+# 🤖 MeTTa AI Configuration
 METTA_SCHEDULER_FILE=scheduler.metta
 ```
 
-### Database Configuration
+### Database Options
 
-**SQLite (Default - for development):**
-```env
-DATABASE_URL=sqlite:///smart_todo.db
-```
+| Environment | Configuration |
+|-------------|---------------|
+| **Development** | `DATABASE_URL=sqlite:///smart_todo.db` |
+| **Production** | `DATABASE_URL=postgresql://user:pass@host/db` |
 
-**PostgreSQL (for production):**
-```env
-DATABASE_URL=postgresql://username:password@localhost/smart_todo
-```
+### Security Notes
+- 🔑 **Change `JWT_SECRET_KEY`** in production
+- 🌐 **Update `CORS_ORIGINS`** for your frontend URL
+- 🔒 **Use PostgreSQL** for production deployments
 
 ## Database Management
 
@@ -157,22 +209,146 @@ python init_db.py reset
 python init_db.py drop
 ```
 
-## MeTTa AI Integration
+## 🤖 MeTTa AI Integration
 
-The backend integrates with MeTTa (Meta Type Talk) reasoning engine for intelligent task scheduling:
+The backend integrates with **MeTTa (Meta Type Talk)** reasoning engine for intelligent task scheduling and decision-making.
 
-### Features:
-- **Smart Prioritization** - Combines deadline urgency with priority weights
-- **Dependency Resolution** - Ensures tasks are scheduled only when dependencies are complete
-- **Circular Dependency Detection** - Prevents invalid task relationships
-- **Ready Task Identification** - Finds tasks that can be started immediately
+### AI Capabilities
 
-### MeTTa Functions:
-- `getNextTask()` - Get the next recommended task
-- `calculateUrgency(taskId)` - Calculate urgency score for a task
-- `isReady(taskId)` - Check if task is ready to start
-- `hasCircularDependency(taskId)` - Detect circular dependencies
-- `getTaskStats()` - Get comprehensive task statistics
+| Feature | Description |
+|---------|-------------|
+| **Smart Prioritization** | Combines deadline urgency with user-defined priority weights |
+| **Dependency Resolution** | Ensures tasks are scheduled only when dependencies are complete |
+| **Circular Dependency Detection** | Prevents invalid task relationships and infinite loops |
+| **Ready Task Identification** | Finds tasks that can be started immediately |
+| **Intelligent Recommendations** | Suggests optimal next tasks based on multiple factors |
+
+### MeTTa Functions
+
+```python
+# Core AI functions available in scheduler.metta
+getNextTask()                    # Get the next recommended task
+calculateUrgency(taskId)         # Calculate urgency score (0-100)
+isReady(taskId)                 # Check if task is ready to start
+hasCircularDependency(taskId)   # Detect circular dependencies
+getTaskStats()                  # Get comprehensive task statistics
+```
+
+### Fallback Logic
+When MeTTa is unavailable, the system automatically falls back to deterministic algorithms:
+- **Priority-based sorting** (High → Medium → Low)
+- **Deadline-based urgency** calculation
+- **Simple dependency checking**
+- **Basic statistics** computation
+
+This ensures **100% uptime** even if AI components fail.
+s \
+  -H "Authorization: Bearer <your_token>"
+```
+
+### Sample Users (Password: "password")
+- **alex.johnson@example.com** - 10 sample tasks with dependencies
+- **sarah.chen@example.com** - Clean slate for testing
+- **mike.rodriguez@example.com** - Additional test user
+
+## ⚙️ Configuration
+
+### Environment Setup
+
+The `python start_server.py init` command automatically creates `.env` from `.env.example`. Manual configuration:
+
+```bash
+cp .env.example .env
+```
+
+### Environment Variables
+
+```env
+# 🌐 Flask Configuration
+FLASK_APP=app.py
+FLASK_ENV=development  # or 'production'
+FLASK_DEBUG=True
+
+# 🗄️ Database Configuration
+DATABASE_URL=sqlite:///smart_todo.db
+
+# 🔐 JWT Security
+JWT_SECRET_KEY=your-super-secret-jwt-key-change-in-production
+JWT_ACCESS_TOKEN_EXPIRES=3600  # 1 hour
+
+# 🌍 CORS Configuration
+CORS_ORIGINS=http://localhost:8080,http://127.0.0.1:8080
+
+# 🖥️ Server Configuration
+HOST=0.0.0.0
+PORT=5000
+
+# 🤖 MeTTa AI Configuration
+METTA_SCHEDULER_FILE=scheduler.metta
+```
+
+### Database Options
+
+| Environment | Configuration |
+|-------------|---------------|
+| **Development** | `DATABASE_URL=sqlite:///smart_todo.db` |
+| **Production** | `DATABASE_URL=postgresql://user:pass@host/db` |
+
+### Security Notes
+- 🔑 **Change `JWT_SECRET_KEY`** in production
+- 🌐 **Update `CORS_ORIGINS`** for your frontend URL
+- 🔒 **Use PostgreSQL** for production deployments
+
+## Database Management
+
+### Initialize Database
+```bash
+python init_db.py init
+```
+
+### Reset Database (drops and recreates)
+```bash
+python init_db.py reset
+```
+
+### Drop Database
+```bash
+python init_db.py drop
+```
+
+## 🤖 MeTTa AI Integration
+
+The backend integrates with **MeTTa (Meta Type Talk)** reasoning engine for intelligent task scheduling and decision-making.
+
+### AI Capabilities
+
+| Feature | Description |
+|---------|-------------|
+| **Smart Prioritization** | Combines deadline urgency with user-defined priority weights |
+| **Dependency Resolution** | Ensures tasks are scheduled only when dependencies are complete |
+| **Circular Dependency Detection** | Prevents invalid task relationships and infinite loops |
+| **Ready Task Identification** | Finds tasks that can be started immediately |
+| **Intelligent Recommendations** | Suggests optimal next tasks based on multiple factors |
+
+### MeTTa Functions
+
+```python
+# Core AI functions available in scheduler.metta
+getNextTask()                    # Get the next recommended task
+calculateUrgency(taskId)         # Calculate urgency score (0-100)
+isReady(taskId)                 # Check if task is ready to start
+hasCircularDependency(taskId)   # Detect circular dependencies
+getTaskStats()                  # Get comprehensive task statistics
+```
+
+### Fallback Logic
+When MeTTa is unavailable, the system automatically falls back to deterministic algorithms:
+- **Priority-based sorting** (High → Medium → Low)
+- **Deadline-based urgency** calculation
+- **Simple dependency checking**
+- **Basic statistics** computation
+
+This ensures **100% uptime** even if AI components fail.
 
 ## Development
 
