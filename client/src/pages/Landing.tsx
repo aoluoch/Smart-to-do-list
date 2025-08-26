@@ -287,7 +287,7 @@ export const Landing: React.FC = () => {
             <span className="text-xl font-bold text-foreground">TaskFlow</span>
           </div>
           <p className="text-muted-foreground">
-            © 2024 TaskFlow. All rights reserved. Built with ❤️ for productivity.
+            © 2025 TaskFlow. All rights reserved. Built for productivity.
           </p>
         </div>
       </footer>
