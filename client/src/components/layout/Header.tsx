@@ -33,10 +33,14 @@ export const Header: React.FC = () => {
     navigate('/login');
   };
 
-  const handleNotificationClick = (notificationId: string, taskId?: string) => {
-    markNotificationAsRead(notificationId);
-    if (taskId) {
-      navigate('/tasks');
+  const handleNotificationClick = async (notificationId: string, taskId?: string) => {
+    try {
+      await markNotificationAsRead(notificationId);
+      if (taskId) {
+        navigate('/tasks');
+      }
+    } catch (error) {
+      console.error('Failed to mark notification as read:', error);
     }
   };
 

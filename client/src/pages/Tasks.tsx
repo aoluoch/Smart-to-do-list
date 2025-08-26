@@ -99,8 +99,12 @@ export const Tasks: React.FC = () => {
     return status !== 'completed' && new Date() > deadline;
   };
 
-  const handleTaskComplete = (taskId: string) => {
-    completeTask(taskId);
+  const handleTaskComplete = async (taskId: string) => {
+    try {
+      await completeTask(taskId);
+    } catch (error) {
+      console.error('Failed to complete task:', error);
+    }
   };
 
   const handleTaskEdit = (task: Task) => {
@@ -108,8 +112,12 @@ export const Tasks: React.FC = () => {
     setIsTaskModalOpen(true);
   };
 
-  const handleTaskDelete = (taskId: string) => {
-    deleteTask(taskId);
+  const handleTaskDelete = async (taskId: string) => {
+    try {
+      await deleteTask(taskId);
+    } catch (error) {
+      console.error('Failed to delete task:', error);
+    }
   };
 
   const handleModalClose = () => {

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { CheckSquare, Clock, AlertTriangle, TrendingUp, Calendar, Target } from 'lucide-react';
 import { useApp } from '@/hooks/useApp';
+import { TaskStats, Task } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -45,15 +46,37 @@ const StatCard: React.FC<{
 export const Dashboard: React.FC = () => {
   const { tasks, getTaskStats, getNextRecommendedTask, completeTask } = useApp();
   const navigate = useNavigate();
-  
-  const stats = getTaskStats();
-  const nextTask = getNextRecommendedTask();
+
+  const [stats, setStats] = useState<TaskStats>({ total: 0, completed: 0, pending: 0, overdue: 0, inProgress: 0 });
+  const [nextTask, setNextTask] = useState<Task | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
   const recentTasks = tasks
     .filter(task => task.status !== 'completed')
     .sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime())
     .slice(0, 5);
 
   const completionRate = stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0;
+
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      setIsLoading(true);
+      try {
+        const [statsData, recommendedTask] = await Promise.all([
+          getTaskStats(),
+          getNextRecommendedTask(),
+        ]);
+        setStats(statsData);
+        setNextTask(recommendedTask);
+      } catch (error) {
+        console.error('Failed to load dashboard data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadDashboardData();
+  }, [tasks]); // Reload when tasks change
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -180,8 +203,21 @@ export const Dashboard: React.FC = () => {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button 
-                    onClick={() => completeTask(nextTask.id)}
+                  <Button
+                    onClick={async () => {
+                      try {
+                        await completeTask(nextTask.id);
+                        // Refresh dashboard data after completing task
+                        const [statsData, recommendedTask] = await Promise.all([
+                          getTaskStats(),
+                          getNextRecommendedTask(),
+                        ]);
+                        setStats(statsData);
+                        setNextTask(recommendedTask);
+                      } catch (error) {
+                        console.error('Failed to complete task:', error);
+                      }
+                    }}
                     className="bg-gradient-success"
                   >
                     Mark Complete
