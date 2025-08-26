@@ -114,13 +114,13 @@ export const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, task }) =
       };
 
       if (task) {
-        updateTask(task.id, taskData);
+        await updateTask(task.id, taskData);
         toast({
           title: 'Task updated',
           description: 'Your task has been successfully updated.',
         });
       } else {
-        addTask(taskData);
+        await addTask(taskData);
         toast({
           title: 'Task created',
           description: 'Your new task has been added successfully.',
