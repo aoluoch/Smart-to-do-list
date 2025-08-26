@@ -26,19 +26,19 @@ A Flask-based REST API backend with AI-powered task scheduling using MeTTa reaso
 
 1. **Navigate to server directory:**
    ```bash
-   cd server
-   ```
+cd server
+```
 
 2. **Create and activate virtual environment:**
    ```bash
-   python -m venv venv
+python -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
+```
 
 3. **One-command setup:**
    ```bash
-   python start_server.py init
-   ```
+python start_server.py init
+```
    This automatically:
    - ✅ Installs all Python dependencies
    - ✅ Creates `.env` configuration file
@@ -48,8 +48,8 @@ A Flask-based REST API backend with AI-powered task scheduling using MeTTa reaso
 
 4. **Start the development server:**
    ```bash
-   python start_server.py
-   ```
+python start_server.py
+```
 
 🌐 **API Server:** `http://localhost:5000`
 📚 **API Docs:** See [`API_DOCUMENTATION.md`](API_DOCUMENTATION.md)
@@ -136,6 +136,113 @@ curl -X POST http://localhost:5000/api/auth/login \
 
 # Get tasks (use token from login)
 curl -X GET http://localhost:5000/api/tasks \
+  -H "Authorization: Bearer <your_token>"
+```
+
+### Sample Users (Password: "password")
+- **alex.johnson@example.com** - 10 sample tasks with dependencies
+- **sarah.chen@example.com** - Clean slate for testing
+- **mike.rodriguez@example.com** - Additional test user
+
+## ⚙️ Configuration
+
+### Environment Setup
+
+The `python start_server.py init` command automatically creates `.env` from `.env.example`. Manual configuration:
+
+```bash
+cp .env.example .env
+```
+
+### Environment Variables
+
+```env
+# 🌐 Flask Configuration
+FLASK_APP=app.py
+FLASK_ENV=development  # or 'production'
+FLASK_DEBUG=True
+
+# 🗄️ Database Configuration
+DATABASE_URL=sqlite:///smart_todo.db
+
+# 🔐 JWT Security
+JWT_SECRET_KEY=your-super-secret-jwt-key-change-in-production
+JWT_ACCESS_TOKEN_EXPIRES=3600  # 1 hour
+
+# 🌍 CORS Configuration
+CORS_ORIGINS=http://localhost:8080,http://127.0.0.1:8080
+
+# 🖥️ Server Configuration
+HOST=0.0.0.0
+PORT=5000
+
+# 🤖 MeTTa AI Configuration
+METTA_SCHEDULER_FILE=scheduler.metta
+```
+
+### Database Options
+
+| Environment | Configuration |
+|-------------|---------------|
+| **Development** | `DATABASE_URL=sqlite:///smart_todo.db` |
+| **Production** | `DATABASE_URL=postgresql://user:pass@host/db` |
+
+### Security Notes
+- 🔑 **Change `JWT_SECRET_KEY`** in production
+- 🌐 **Update `CORS_ORIGINS`** for your frontend URL
+- 🔒 **Use PostgreSQL** for production deployments
+
+## Database Management
+
+### Initialize Database
+```bash
+python init_db.py init
+```
+
+### Reset Database (drops and recreates)
+```bash
+python init_db.py reset
+```
+
+### Drop Database
+```bash
+python init_db.py drop
+```
+
+## 🤖 MeTTa AI Integration
+
+The backend integrates with **MeTTa (Meta Type Talk)** reasoning engine for intelligent task scheduling and decision-making.
+
+### AI Capabilities
+
+| Feature | Description |
+|---------|-------------|
+| **Smart Prioritization** | Combines deadline urgency with user-defined priority weights |
+| **Dependency Resolution** | Ensures tasks are scheduled only when dependencies are complete |
+| **Circular Dependency Detection** | Prevents invalid task relationships and infinite loops |
+| **Ready Task Identification** | Finds tasks that can be started immediately |
+| **Intelligent Recommendations** | Suggests optimal next tasks based on multiple factors |
+
+### MeTTa Functions
+
+```python
+# Core AI functions available in scheduler.metta
+getNextTask()                    # Get the next recommended task
+calculateUrgency(taskId)         # Calculate urgency score (0-100)
+isReady(taskId)                 # Check if task is ready to start
+hasCircularDependency(taskId)   # Detect circular dependencies
+getTaskStats()                  # Get comprehensive task statistics
+```
+
+### Fallback Logic
+When MeTTa is unavailable, the system automatically falls back to deterministic algorithms:
+- **Priority-based sorting** (High → Medium → Low)
+- **Deadline-based urgency** calculation
+- **Simple dependency checking**
+- **Basic statistics** computation
+
+This ensures **100% uptime** even if AI components fail.
+s \
   -H "Authorization: Bearer <your_token>"
 ```
 

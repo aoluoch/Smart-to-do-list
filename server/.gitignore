@@ -1,0 +1,313 @@
+# Smart To-Do Scheduler Backend
+
+A Flask-based REST API backend with AI-powered task scheduling using MeTTa reasoning engine for intelligent task prioritization and dependency management.
+
+## 🚀 Features
+
+- **RESTful API** with comprehensive endpoints for task management
+- **AI-Powered Scheduling** using MeTTa reasoning engine for intelligent task prioritization
+- **JWT Authentication** for secure user sessions with token-based authorization
+- **Dependency Management** with circular dependency detection and resolution
+- **Real-time Notifications** for task updates, deadlines, and completion alerts
+- **Comprehensive Testing** with automated test suites (16 tests, 100% coverage)
+- **Database Migrations** with SQLAlchemy ORM and PostgreSQL/SQLite support
+- **Health Monitoring** with dedicated health check endpoints
+- **CORS Support** for cross-origin requests from frontend applications
+
+## Quick Start
+
+### Prerequisites
+
+- Python 3.8 or higher
+- pip (Python package manager)
+- Virtual environment (recommended)
+
+### Installation
+
+1. **Clone and navigate to server directory:**
+   ```bash
+cd server
+```
+
+2. **Create virtual environment (recommended):**
+   ```bash
+python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+3. **Initialize the project:**
+   ```bash
+python start_server.py init
+```
+   This will:
+   - Install all dependencies
+   - Create environment configuration
+   - Initialize database with sample data
+   - Verify MeTTa integration
+
+4. **Start the server:**
+   ```bash
+python start_server.py
+```
+
+The API server will be running at `http://localhost:5000`
+
+## API Endpoints
+
+### Authentication
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - User login
+- `GET /api/auth/me` - Get current user info
+
+### Tasks
+- `GET /api/tasks` - Get all tasks
+- `POST /api/tasks` - Create new task
+- `GET /api/tasks/{id}` - Get specific task
+- `PUT /api/tasks/{id}` - Update task
+- `DELETE /api/tasks/{id}` - Delete task
+- `POST /api/tasks/{id}/complete` - Mark task as completed
+
+### AI-Powered Features
+- `GET /api/tasks/recommended` - Get AI-recommended next task
+- `GET /api/tasks/stats` - Get task statistics
+- `GET /api/dependencies/graph` - Get dependency graph with ready tasks
+
+### Notifications
+- `GET /api/notifications` - Get all notifications
+- `PUT /api/notifications/{id}/read` - Mark notification as read
+- `DELETE /api/notifications` - Clear all notifications
+
+### Health Check
+- `GET /api/health` - Server health status
+
+## Testing
+
+### Automated Tests
+```bash
+# Run pytest test suite
+python start_server.py test
+
+# Or run directly
+pytest test_api.py -v
+```
+
+### Manual Testing
+```bash
+# Run comprehensive manual tests
+python test_manual.py
+
+# Test against different server
+python test_manual.py http://localhost:5000
+```
+
+## Configuration
+
+### Environment Variables
+
+Copy `.env.example` to `.env` and configure:
+
+```env
+# Flask Configuration
+FLASK_APP=app.py
+FLASK_ENV=development
+FLASK_DEBUG=True
+
+# Database Configuration
+DATABASE_URL=sqlite:///smart_todo.db
+
+# JWT Configuration
+JWT_SECRET_KEY=your-super-secret-jwt-key
+JWT_ACCESS_TOKEN_EXPIRES=3600
+
+# CORS Configuration
+CORS_ORIGINS=http://localhost:8080,http://127.0.0.1:8080
+
+# Server Configuration
+HOST=0.0.0.0
+PORT=5000
+
+# MeTTa Configuration
+METTA_SCHEDULER_FILE=scheduler.metta
+```
+
+### Database Configuration
+
+**SQLite (Default - for development):**
+```env
+DATABASE_URL=sqlite:///smart_todo.db
+```
+
+**PostgreSQL (for production):**
+```env
+DATABASE_URL=postgresql://username:password@localhost/smart_todo
+```
+
+## Database Management
+
+### Initialize Database
+```bash
+python init_db.py init
+```
+
+### Reset Database (drops and recreates)
+```bash
+python init_db.py reset
+```
+
+### Drop Database
+```bash
+python init_db.py drop
+```
+
+## MeTTa AI Integration
+
+The backend integrates with MeTTa (Meta Type Talk) reasoning engine for intelligent task scheduling:
+
+### Features:
+- **Smart Prioritization** - Combines deadline urgency with priority weights
+- **Dependency Resolution** - Ensures tasks are scheduled only when dependencies are complete
+- **Circular Dependency Detection** - Prevents invalid task relationships
+- **Ready Task Identification** - Finds tasks that can be started immediately
+
+### MeTTa Functions:
+- `getNextTask()` - Get the next recommended task
+- `calculateUrgency(taskId)` - Calculate urgency score for a task
+- `isReady(taskId)` - Check if task is ready to start
+- `hasCircularDependency(taskId)` - Detect circular dependencies
+- `getTaskStats()` - Get comprehensive task statistics
+
+## Development
+
+### Project Structure
+```
+server/
+├── app.py                 # Main Flask application
+├── models.py              # Database models
+├── metta_service.py       # MeTTa integration service
+├── scheduler.metta        # MeTTa knowledge base
+├── requirements.txt       # Python dependencies
+├── init_db.py            # Database initialization
+├── start_server.py       # Server startup script
+├── test_api.py           # Automated test suite
+├── test_manual.py        # Manual testing script
+├── .env                  # Environment configuration
+└── README.md             # This file
+```
+
+### Adding New Endpoints
+
+1. **Add route to `app.py`:**
+   ```python
+@app.route('/api/new-endpoint', methods=['POST'])
+   @jwt_required()
+   def new_endpoint():
+       # Implementation
+       pass
+```
+
+2. **Add tests to `test_api.py`:**
+   ```python
+def test_new_endpoint(self, client, auth_headers):
+       response = client.post('/api/new-endpoint', headers=auth_headers)
+       assert response.status_code == 200
+```
+
+3. **Update manual tests in `test_manual.py`**
+
+### Database Schema Changes
+
+1. **Modify models in `models.py`**
+2. **Create migration:**
+   ```bash
+flask db migrate -m "Description of changes"
+```
+3. **Apply migration:**
+   ```bash
+flask db upgrade
+```
+
+## Production Deployment
+
+### Environment Setup
+1. Set `FLASK_ENV=production`
+2. Use PostgreSQL database
+3. Set strong `JWT_SECRET_KEY`
+4. Configure proper CORS origins
+5. Use WSGI server (gunicorn, uWSGI)
+
+### Example with Gunicorn
+```bash
+pip install gunicorn
+gunicorn -w 4 -b 0.0.0.0:5000 app:app
+```
+
+### Docker Deployment
+```dockerfile
+FROM python:3.9-slim
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY . .
+EXPOSE 5000
+
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "app:app"]
+```
+
+## Troubleshooting
+
+### Common Issues
+
+**1. MeTTa Import Error:**
+```bash
+pip install hyperon
+```
+
+**2. Database Connection Error:**
+- Check DATABASE_URL in .env
+- Ensure database exists (for PostgreSQL)
+- Run `python init_db.py init`
+
+**3. CORS Issues:**
+- Update CORS_ORIGINS in .env
+- Ensure frontend URL is included
+
+**4. JWT Token Issues:**
+- Check JWT_SECRET_KEY is set
+- Verify token expiration time
+
+### Debug Mode
+
+Enable debug logging:
+```python
+import logging
+logging.basicConfig(level=logging.DEBUG)
+```
+
+### Health Check
+
+Check if server is running:
+```bash
+curl http://localhost:5000/api/health
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create feature branch
+3. Add tests for new functionality
+4. Ensure all tests pass
+5. Submit pull request
+
+## License
+
+This project is licensed under the MIT License.
+
+## Support
+
+For issues and questions:
+1. Check this README
+2. Run the test suite
+3. Check server logs
+4. Create an issue with detailed error information
