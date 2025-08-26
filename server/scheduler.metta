@@ -72,10 +72,9 @@
 ;reconfiguring the urgency caculator to also make deadline as important as priority
 ;caculate highest /max   day to deadline  among all tasks
 (= (getMaxDays)
-(let $allDeadlines (match $self (task $id $desc $deadline $priority $duration )$deadline)
-  (let $allDays (map daysDifference $allDeadlines))
-  (maxList $allDays)
-))
+   (let $allDeadlines (match &self (task $id $desc $deadline $priority $duration $status $deps) $deadline)
+     (let $allDays (map daysDifference $allDeadlines)
+       (maxList $allDays))))
 
 ;helper function to get max from the list
 (= (maxList ($x)) $x)

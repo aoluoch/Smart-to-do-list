@@ -25,20 +25,72 @@ class MeTTaSchedulerService:
             if os.path.exists(self.metta_file_path):
                 with open(self.metta_file_path, 'r') as f:
                     content = f.read()
-                
-                # Execute the MeTTa knowledge base
-                lines = content.strip().split('\n')
-                for line in lines:
-                    line = line.strip()
-                    if line and not line.startswith(';') and not line.startswith('#'):
+
+                # Parse and execute complete MeTTa expressions
+                expressions = self._parse_metta_expressions(content)
+                for expr in expressions:
+                    if expr.strip():
                         try:
-                            self.metta.run(line)
+                            self.metta.run(expr)
                         except Exception as e:
-                            print(f"Warning: Error executing MeTTa line '{line}': {e}")
+                            print(f"Warning: Error executing MeTTa expression '{expr[:50]}...': {e}")
             else:
                 print(f"Warning: MeTTa file {self.metta_file_path} not found")
         except Exception as e:
             print(f"Error loading MeTTa knowledge base: {e}")
+
+    def _parse_metta_expressions(self, content: str) -> List[str]:
+        """Parse MeTTa content into complete expressions"""
+        expressions = []
+        current_expr = ""
+        paren_count = 0
+        in_string = False
+        escape_next = False
+
+        for char in content:
+            if escape_next:
+                current_expr += char
+                escape_next = False
+                continue
+
+            if char == '\\':
+                escape_next = True
+                current_expr += char
+                continue
+
+            if char == '"' and not escape_next:
+                in_string = not in_string
+                current_expr += char
+                continue
+
+            if not in_string:
+                if char == '(':
+                    if paren_count == 0 and current_expr.strip():
+                        # Check if this is a comment line
+                        stripped = current_expr.strip()
+                        if not (stripped.startswith(';') or stripped.startswith('#')):
+                            expressions.append(current_expr.strip())
+                        current_expr = ""
+                    paren_count += 1
+                elif char == ')':
+                    paren_count -= 1
+
+            current_expr += char
+
+            # If we've closed all parentheses and have content, we have a complete expression
+            if not in_string and paren_count == 0 and current_expr.strip():
+                stripped = current_expr.strip()
+                if not (stripped.startswith(';') or stripped.startswith('#')):
+                    expressions.append(stripped)
+                current_expr = ""
+
+        # Handle any remaining content
+        if current_expr.strip():
+            stripped = current_expr.strip()
+            if not (stripped.startswith(';') or stripped.startswith('#')):
+                expressions.append(stripped)
+
+        return expressions
     
     def _task_to_metta_format(self, task: Task) -> str:
         """Convert a Task object to MeTTa format"""
