@@ -45,11 +45,11 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-secondary/30 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-secondary/30 flex items-center justify-center p-3 sm:p-4">
       {/* Back to Home Button */}
-      <Link 
-        to="/" 
-        className="fixed top-6 left-6 z-10 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group"
+      <Link
+        to="/"
+        className="fixed top-4 sm:top-6 left-4 sm:left-6 z-10 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group"
       >
         <div className="p-2 rounded-lg bg-background/80 backdrop-blur-sm border border-border group-hover:bg-background transition-colors">
           <Home className="w-4 h-4" />
@@ -61,30 +61,30 @@ export const Login: React.FC = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
+        className="w-full max-w-sm sm:max-w-md"
       >
         {/* Logo */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6 sm:mb-8">
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-            className="inline-flex items-center justify-center w-16 h-16 bg-gradient-primary rounded-2xl mb-4 shadow-glow"
+            className="inline-flex items-center justify-center w-14 sm:w-16 h-14 sm:h-16 bg-gradient-primary rounded-2xl mb-3 sm:mb-4 shadow-glow"
           >
-            <Target className="w-8 h-8 text-white" />
+            <Target className="w-7 sm:w-8 h-7 sm:h-8 text-white" />
           </motion.div>
-          <h1 className="text-2xl font-bold text-card-foreground">TaskFlow</h1>
-          <p className="text-muted-foreground mt-2">Intelligent task management</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-card-foreground">TaskFlow</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-2">Intelligent task management</p>
         </div>
 
         <Card className="shadow-custom-lg border-0">
-          <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-xl">Welcome back</CardTitle>
-            <CardDescription>
+          <CardHeader className="space-y-1 text-center px-4 sm:px-6 pt-4 sm:pt-6">
+            <CardTitle className="text-lg sm:text-xl">Welcome back</CardTitle>
+            <CardDescription className="text-sm sm:text-base">
               Sign in to your account to continue
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 px-4 sm:px-6 pb-4 sm:pb-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               {error && (
                 <Alert variant="destructive">
@@ -101,7 +101,7 @@ export const Login: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="h-11"
+                  className="h-10 sm:h-11 text-sm sm:text-base"
                 />
               </div>
               
@@ -115,7 +115,7 @@ export const Login: React.FC = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="h-11 pr-10"
+                    className="h-10 sm:h-11 pr-10 text-sm sm:text-base"
                   />
                   <Button
                     type="button"
@@ -135,7 +135,7 @@ export const Login: React.FC = () => {
 
               <Button
                 type="submit"
-                className="w-full h-11 bg-gradient-primary hover:opacity-90 transition-opacity"
+                className="w-full h-10 sm:h-11 bg-gradient-primary hover:opacity-90 transition-opacity text-sm sm:text-base"
                 disabled={isLoading}
               >
                 {isLoading ? 'Signing in...' : 'Sign In'}

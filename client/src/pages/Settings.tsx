@@ -220,36 +220,36 @@ export const Settings: React.FC = () => {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-card-foreground">Settings</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-card-foreground">Settings</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">
             Manage your account settings and preferences
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Profile Settings */}
         <SettingsSection
           title="Profile"
           description="Manage your personal information and account details"
           icon={User}
         >
-          <div className="flex items-center gap-4">
-            <Avatar className="h-16 w-16">
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            <Avatar className="h-14 w-14 sm:h-16 sm:w-16">
               <AvatarImage src={user?.avatar} alt={user?.username} />
-              <AvatarFallback className="bg-gradient-primary text-white text-lg">
+              <AvatarFallback className="bg-gradient-primary text-white text-base sm:text-lg">
                 {user?.username?.charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="w-full sm:w-auto">
               Change Avatar
             </Button>
           </div>
-          
+
           <div className="grid grid-cols-1 gap-4">
             <div className="space-y-2">
               <Label htmlFor="username">Full Name</Label>
