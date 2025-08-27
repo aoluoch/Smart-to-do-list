@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { CheckSquare, Clock, AlertTriangle, TrendingUp, Calendar, Target } from 'lucide-react';
 import { useApp } from '@/hooks/useApp';
+import { TaskStats, Task } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -23,11 +24,11 @@ const StatCard: React.FC<{
   >
     <Card className="hover:shadow-custom-md transition-shadow">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
+        <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">{title}</CardTitle>
         <Icon className={`w-4 h-4 text-${color}`} />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold text-card-foreground">{value}</div>
+        <div className="text-xl sm:text-2xl font-bold text-card-foreground">{value}</div>
         <p className="text-xs text-muted-foreground flex items-center gap-1">
           {trend && (
             <span className="text-success">
@@ -45,15 +46,37 @@ const StatCard: React.FC<{
 export const Dashboard: React.FC = () => {
   const { tasks, getTaskStats, getNextRecommendedTask, completeTask } = useApp();
   const navigate = useNavigate();
-  
-  const stats = getTaskStats();
-  const nextTask = getNextRecommendedTask();
+
+  const [stats, setStats] = useState<TaskStats>({ total: 0, completed: 0, pending: 0, overdue: 0, inProgress: 0 });
+  const [nextTask, setNextTask] = useState<Task | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
   const recentTasks = tasks
     .filter(task => task.status !== 'completed')
     .sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime())
     .slice(0, 5);
 
   const completionRate = stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0;
+
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      setIsLoading(true);
+      try {
+        const [statsData, recommendedTask] = await Promise.all([
+          getTaskStats(),
+          getNextRecommendedTask(),
+        ]);
+        setStats(statsData);
+        setNextTask(recommendedTask);
+      } catch (error) {
+        console.error('Failed to load dashboard data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadDashboardData();
+  }, [tasks]); // Reload when tasks change
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -90,18 +113,19 @@ export const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-card-foreground">Dashboard</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-card-foreground">Dashboard</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">
             Welcome back! Here's what's happening with your tasks.
           </p>
         </div>
-        <Button 
+        <Button
           onClick={() => navigate('/tasks')}
-          className="bg-gradient-primary hover:opacity-90"
+          className="bg-gradient-primary hover:opacity-90 w-full sm:w-auto"
+          size="sm"
         >
           <Target className="w-4 h-4 mr-2" />
           Manage Tasks
@@ -109,7 +133,7 @@ export const Dashboard: React.FC = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <StatCard
           title="Total Tasks"
           value={stats.total}
@@ -180,8 +204,21 @@ export const Dashboard: React.FC = () => {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button 
-                    onClick={() => completeTask(nextTask.id)}
+                  <Button
+                    onClick={async () => {
+                      try {
+                        await completeTask(nextTask.id);
+                        // Refresh dashboard data after completing task
+                        const [statsData, recommendedTask] = await Promise.all([
+                          getTaskStats(),
+                          getNextRecommendedTask(),
+                        ]);
+                        setStats(statsData);
+                        setNextTask(recommendedTask);
+                      } catch (error) {
+                        console.error('Failed to complete task:', error);
+                      }
+                    }}
                     className="bg-gradient-success"
                   >
                     Mark Complete

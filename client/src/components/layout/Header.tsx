@@ -33,17 +33,21 @@ export const Header: React.FC = () => {
     navigate('/login');
   };
 
-  const handleNotificationClick = (notificationId: string, taskId?: string) => {
-    markNotificationAsRead(notificationId);
-    if (taskId) {
-      navigate('/tasks');
+  const handleNotificationClick = async (notificationId: string, taskId?: string) => {
+    try {
+      await markNotificationAsRead(notificationId);
+      if (taskId) {
+        navigate('/tasks');
+      }
+    } catch (error) {
+      console.error('Failed to mark notification as read:', error);
     }
   };
 
   return (
-    <header className="h-16 bg-card border-b border-border shadow-custom-sm px-6 flex items-center justify-between">
-      {/* Search Bar */}
-      <div className="flex-1 max-w-md relative">
+    <header className="h-16 bg-card border-b border-border shadow-custom-sm px-3 sm:px-4 md:px-6 flex items-center justify-between">
+      {/* Search Bar - Hidden on small screens, shown on medium+ */}
+      <div className="hidden md:flex flex-1 max-w-md relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
         <Input
           placeholder="Search tasks..."
@@ -53,8 +57,15 @@ export const Header: React.FC = () => {
         />
       </div>
 
+      {/* Mobile Search Button - Shown only on small screens */}
+      <div className="md:hidden flex-1">
+        <Button variant="ghost" size="sm" className="p-2">
+          <Search className="w-5 h-5" />
+        </Button>
+      </div>
+
       {/* Right Side - Notifications & Profile */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-4">
         {/* Notifications */}
         <Popover>
           <PopoverTrigger asChild>
@@ -70,8 +81,8 @@ export const Header: React.FC = () => {
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-80 p-0" align="end">
-            <div className="p-4 border-b border-border">
+          <PopoverContent className="w-72 sm:w-80 p-0" align="end">
+            <div className="p-3 sm:p-4 border-b border-border">
               <h3 className="font-semibold text-sm">Notifications</h3>
               {unreadNotifications.length > 0 && (
                 <p className="text-xs text-muted-foreground mt-1">
@@ -88,7 +99,7 @@ export const Header: React.FC = () => {
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -20 }}
-                      className={`p-4 border-b border-border/50 cursor-pointer hover:bg-muted/50 transition-colors ${
+                      className={`p-3 sm:p-4 border-b border-border/50 cursor-pointer hover:bg-muted/50 transition-colors ${
                         !notification.read ? 'bg-muted/30' : ''
                       }`}
                       onClick={() => handleNotificationClick(notification.id, notification.taskId)}
@@ -122,11 +133,11 @@ export const Header: React.FC = () => {
           </PopoverContent>
         </Popover>
 
-        {/* Settings */}
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="p-2"
+        {/* Settings - Hidden on small screens */}
+        <Button
+          variant="ghost"
+          size="sm"
+          className="p-2 hidden sm:flex"
           onClick={() => navigate('/settings')}
         >
           <Settings className="w-5 h-5" />
@@ -144,7 +155,7 @@ export const Header: React.FC = () => {
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56" align="end" forceMount>
+          <DropdownMenuContent className="w-48 sm:w-56" align="end" forceMount>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
                 <p className="text-sm font-medium leading-none">{user?.username}</p>

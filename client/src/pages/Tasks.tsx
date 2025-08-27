@@ -99,8 +99,12 @@ export const Tasks: React.FC = () => {
     return status !== 'completed' && new Date() > deadline;
   };
 
-  const handleTaskComplete = (taskId: string) => {
-    completeTask(taskId);
+  const handleTaskComplete = async (taskId: string) => {
+    try {
+      await completeTask(taskId);
+    } catch (error) {
+      console.error('Failed to complete task:', error);
+    }
   };
 
   const handleTaskEdit = (task: Task) => {
@@ -108,8 +112,12 @@ export const Tasks: React.FC = () => {
     setIsTaskModalOpen(true);
   };
 
-  const handleTaskDelete = (taskId: string) => {
-    deleteTask(taskId);
+  const handleTaskDelete = async (taskId: string) => {
+    try {
+      await deleteTask(taskId);
+    } catch (error) {
+      console.error('Failed to delete task:', error);
+    }
   };
 
   const handleModalClose = () => {
@@ -118,18 +126,19 @@ export const Tasks: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-card-foreground">Tasks</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-card-foreground">Tasks</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">
             Manage and track all your tasks in one place
           </p>
         </div>
-        <Button 
+        <Button
           onClick={() => setIsTaskModalOpen(true)}
-          className="bg-gradient-primary hover:opacity-90"
+          className="bg-gradient-primary hover:opacity-90 w-full sm:w-auto"
+          size="sm"
         >
           <Plus className="w-4 h-4 mr-2" />
           Add Task
@@ -138,8 +147,8 @@ export const Tasks: React.FC = () => {
 
       {/* Filters and Search */}
       <Card>
-        <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row gap-4">
+        <CardContent className="p-4 sm:p-6">
+          <div className="flex flex-col gap-4">
             {/* Search */}
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
@@ -152,9 +161,9 @@ export const Tasks: React.FC = () => {
             </div>
 
             {/* Filters */}
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-32">
+                <SelectTrigger className="w-full sm:w-32">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -166,7 +175,7 @@ export const Tasks: React.FC = () => {
               </Select>
 
               <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-                <SelectTrigger className="w-32">
+                <SelectTrigger className="w-full sm:w-32">
                   <SelectValue placeholder="Priority" />
                 </SelectTrigger>
                 <SelectContent>
@@ -178,7 +187,7 @@ export const Tasks: React.FC = () => {
               </Select>
 
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-32">
+                <SelectTrigger className="w-full sm:w-32">
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>
@@ -193,8 +202,8 @@ export const Tasks: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Tasks Table */}
-      <Card>
+      {/* Tasks Table - Desktop */}
+      <Card className="hidden md:block">
         <CardHeader>
           <CardTitle>
             {filteredTasks.length} Task{filteredTasks.length !== 1 ? 's' : ''}
@@ -337,8 +346,132 @@ export const Tasks: React.FC = () => {
         </CardContent>
       </Card>
 
+      {/* Tasks Cards - Mobile */}
+      <div className="md:hidden space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold">
+            {filteredTasks.length} Task{filteredTasks.length !== 1 ? 's' : ''}
+          </h3>
+        </div>
+
+        <AnimatePresence>
+          {filteredTasks.map((task, index) => (
+            <motion.div
+              key={task.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.2, delay: index * 0.05 }}
+            >
+              <Card className="p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-3 flex-1 min-w-0">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleTaskComplete(task.id)}
+                      disabled={task.status === 'completed'}
+                      className="p-1 h-8 w-8 flex-shrink-0 mt-1"
+                    >
+                      <CheckSquare2 className={`w-4 h-4 ${
+                        task.status === 'completed'
+                          ? 'text-success'
+                          : 'text-muted-foreground hover:text-success'
+                      }`} />
+                    </Button>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h4 className="font-medium text-card-foreground truncate">
+                          {task.title}
+                        </h4>
+                        {isOverdue(task.deadline, task.status) && (
+                          <AlertTriangle className="w-4 h-4 text-destructive flex-shrink-0" />
+                        )}
+                      </div>
+
+                      {task.description && (
+                        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                          {task.description}
+                        </p>
+                      )}
+
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        <Badge variant={getPriorityColor(task.priority)} className="capitalize text-xs">
+                          {task.priority}
+                        </Badge>
+                        <Badge variant={getStatusColor(task.status)} className="capitalize text-xs">
+                          {task.status.replace('-', ' ')}
+                        </Badge>
+                      </div>
+
+                      <div className="flex flex-col gap-1 text-xs text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          <span className={
+                            isOverdue(task.deadline, task.status)
+                              ? 'text-destructive font-medium'
+                              : ''
+                          }>
+                            {formatDistanceToNow(task.deadline, { addSuffix: true })}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {Math.floor(task.duration / 60)}h {task.duration % 60}m
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0 flex-shrink-0">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleTaskEdit(task)}>
+                        <Edit className="mr-2 h-4 w-4" />
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleTaskDelete(task.id)}
+                        className="text-destructive"
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </Card>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+
+        {filteredTasks.length === 0 && (
+          <div className="text-center py-12">
+            <CheckSquare2 className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+            <h3 className="text-lg font-medium text-card-foreground mb-2">No tasks found</h3>
+            <p className="text-muted-foreground mb-4 text-sm">
+              {searchQuery || statusFilter !== 'all' || priorityFilter !== 'all'
+                ? 'Try adjusting your filters or search query'
+                : 'Create your first task to get started'
+              }
+            </p>
+            {!searchQuery && statusFilter === 'all' && priorityFilter === 'all' && (
+              <Button onClick={() => setIsTaskModalOpen(true)} size="sm">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Your First Task
+              </Button>
+            )}
+          </div>
+        )}
+      </div>
+
       {/* Task Modal */}
-      <TaskModal 
+      <TaskModal
         isOpen={isTaskModalOpen}
         onClose={handleModalClose}
         task={editingTask}

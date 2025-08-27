@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, Task, Notification, TaskStats } from '@/types';
+import { apiService } from '@/services/api';
 
 export interface AppContextType {
   // Authentication
@@ -8,21 +9,21 @@ export interface AppContextType {
   login: (email: string, password: string) => Promise<boolean>;
   register: (username: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
-  
+
   // Tasks
   tasks: Task[];
-  addTask: (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  updateTask: (id: string, updates: Partial<Task>) => void;
-  deleteTask: (id: string) => void;
-  completeTask: (id: string) => void;
-  getTaskStats: () => TaskStats;
-  getNextRecommendedTask: () => Task | null;
-  
+  addTask: (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  updateTask: (id: string, updates: Partial<Task>) => Promise<void>;
+  deleteTask: (id: string) => Promise<void>;
+  completeTask: (id: string) => Promise<void>;
+  getTaskStats: () => Promise<TaskStats>;
+  getNextRecommendedTask: () => Promise<Task | null>;
+
   // Notifications
   notifications: Notification[];
-  markNotificationAsRead: (id: string) => void;
-  clearAllNotifications: () => void;
-  
+  markNotificationAsRead: (id: string) => Promise<void>;
+  clearAllNotifications: () => Promise<void>;
+
   // UI State
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
@@ -41,41 +42,48 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   useEffect(() => {
     // Check if user is already logged in
-    const savedAuth = localStorage.getItem('todoapp_auth');
-    const savedUser = localStorage.getItem('todoapp_user');
-    if (savedAuth && savedUser) {
-      try {
-        const userData = JSON.parse(savedUser);
-        setUser(userData);
-        setIsAuthenticated(true);
-      } catch (error) {
-        // Clear invalid data
-        localStorage.removeItem('todoapp_auth');
-        localStorage.removeItem('todoapp_user');
-      }
+    const savedToken = localStorage.getItem('todoapp_token');
+    if (savedToken) {
+      // Verify token by fetching current user
+      apiService.getCurrentUser()
+        .then(({ user }) => {
+          setUser(user);
+          setIsAuthenticated(true);
+          // Load user's tasks and notifications
+          loadUserData();
+        })
+        .catch(() => {
+          // Token is invalid, clear it
+          apiService.logout();
+          localStorage.removeItem('todoapp_user');
+        });
     }
   }, []);
 
+  const loadUserData = async () => {
+    try {
+      const [tasksResponse, notificationsResponse] = await Promise.all([
+        apiService.getTasks(),
+        apiService.getNotifications(),
+      ]);
+      setTasks(tasksResponse.tasks);
+      setNotifications(notificationsResponse.notifications);
+    } catch (error) {
+      console.error('Failed to load user data:', error);
+    }
+  };
+
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      // TODO: Replace with actual API call to backend
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const response = await apiService.login(email, password);
+      setUser(response.user);
+      setIsAuthenticated(true);
+      localStorage.setItem('todoapp_user', JSON.stringify(response.user));
 
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data.user);
-        setIsAuthenticated(true);
-        localStorage.setItem('todoapp_auth', 'true');
-        localStorage.setItem('todoapp_user', JSON.stringify(data.user));
-        return true;
-      }
-      return false;
+      // Load user's tasks and notifications
+      await loadUserData();
+
+      return true;
     } catch (error) {
       console.error('Login error:', error);
       return false;
@@ -84,24 +92,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const register = async (username: string, email: string, password: string): Promise<boolean> => {
     try {
-      // TODO: Replace with actual API call to backend
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, email, password }),
-      });
+      const response = await apiService.register(username, email, password);
+      setUser(response.user);
+      setIsAuthenticated(true);
+      localStorage.setItem('todoapp_user', JSON.stringify(response.user));
 
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data.user);
-        setIsAuthenticated(true);
-        localStorage.setItem('todoapp_auth', 'true');
-        localStorage.setItem('todoapp_user', JSON.stringify(data.user));
-        return true;
-      }
-      return false;
+      // Load user's tasks and notifications (will be empty for new user)
+      await loadUserData();
+
+      return true;
     } catch (error) {
       console.error('Registration error:', error);
       return false;
@@ -109,92 +108,130 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const logout = () => {
+    apiService.logout();
     setUser(null);
     setIsAuthenticated(false);
     setTasks([]);
     setNotifications([]);
-    localStorage.removeItem('todoapp_auth');
     localStorage.removeItem('todoapp_user');
   };
 
-  const addTask = (taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newTask: Task = {
-      ...taskData,
-      id: Date.now().toString(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    setTasks(prev => [newTask, ...prev]);
+  const addTask = async (taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      const response = await apiService.createTask(taskData);
+      setTasks(prev => [response.task, ...prev]);
+    } catch (error) {
+      console.error('Failed to create task:', error);
+      throw error;
+    }
   };
 
-  const updateTask = (id: string, updates: Partial<Task>) => {
-    setTasks(prev => prev.map(task => 
-      task.id === id 
-        ? { ...task, ...updates, updatedAt: new Date() }
-        : task
-    ));
+  const updateTask = async (id: string, updates: Partial<Task>) => {
+    try {
+      const response = await apiService.updateTask(id, updates);
+      setTasks(prev => prev.map(task =>
+        task.id === id ? response.task : task
+      ));
+    } catch (error) {
+      console.error('Failed to update task:', error);
+      throw error;
+    }
   };
 
-  const deleteTask = (id: string) => {
-    setTasks(prev => prev.filter(task => task.id !== id));
+  const deleteTask = async (id: string) => {
+    try {
+      await apiService.deleteTask(id);
+      setTasks(prev => prev.filter(task => task.id !== id));
+    } catch (error) {
+      console.error('Failed to delete task:', error);
+      throw error;
+    }
   };
 
-  const completeTask = (id: string) => {
-    setTasks(prev => prev.map(task => 
-      task.id === id 
-        ? { 
-            ...task, 
-            status: 'completed' as const, 
-            completedAt: new Date(),
-            updatedAt: new Date()
-          }
-        : task
-    ));
+  const completeTask = async (id: string) => {
+    try {
+      const response = await apiService.completeTask(id);
+      setTasks(prev => prev.map(task =>
+        task.id === id ? response.task : task
+      ));
+      // Refresh notifications as completing a task may generate new ones
+      const notificationsResponse = await apiService.getNotifications();
+      setNotifications(notificationsResponse.notifications);
+    } catch (error) {
+      console.error('Failed to complete task:', error);
+      throw error;
+    }
   };
 
-  const getTaskStats = (): TaskStats => {
-    const now = new Date();
-    const total = tasks.length;
-    const completed = tasks.filter(task => task.status === 'completed').length;
-    const pending = tasks.filter(task => task.status === 'pending').length;
-    const inProgress = tasks.filter(task => task.status === 'in-progress').length;
-    const overdue = tasks.filter(task => 
-      task.status !== 'completed' && task.deadline < now
-    ).length;
+  const getTaskStats = async (): Promise<TaskStats> => {
+    try {
+      const response = await apiService.getTaskStats();
+      return response.stats;
+    } catch (error) {
+      console.error('Failed to get task stats:', error);
+      // Fallback to local calculation
+      const now = new Date();
+      const total = tasks.length;
+      const completed = tasks.filter(task => task.status === 'completed').length;
+      const pending = tasks.filter(task => task.status === 'pending').length;
+      const inProgress = tasks.filter(task => task.status === 'in-progress').length;
+      const overdue = tasks.filter(task =>
+        task.status !== 'completed' && task.deadline < now
+      ).length;
 
-    return { total, completed, pending, overdue, inProgress };
+      return { total, completed, pending, overdue, inProgress };
+    }
   };
 
-  const getNextRecommendedTask = (): Task | null => {
-    const now = new Date();
-    const incompleteTasks = tasks.filter(task => task.status !== 'completed');
-    
-    // Priority scoring: deadline urgency + priority weight
-    const scoredTasks = incompleteTasks.map(task => {
-      const hoursUntilDeadline = (task.deadline.getTime() - now.getTime()) / (1000 * 60 * 60);
-      const priorityWeight = task.priority === 'high' ? 3 : task.priority === 'medium' ? 2 : 1;
-      const urgencyScore = Math.max(0, 100 - hoursUntilDeadline); // Higher score for sooner deadlines
-      
-      return {
-        task,
-        score: urgencyScore * priorityWeight
-      };
-    });
+  const getNextRecommendedTask = async (): Promise<Task | null> => {
+    try {
+      const response = await apiService.getRecommendedTask();
+      return response.task;
+    } catch (error) {
+      console.error('Failed to get recommended task:', error);
+      // Fallback to local calculation
+      const now = new Date();
+      const incompleteTasks = tasks.filter(task => task.status !== 'completed');
 
-    scoredTasks.sort((a, b) => b.score - a.score);
-    return scoredTasks.length > 0 ? scoredTasks[0].task : null;
+      // Priority scoring: deadline urgency + priority weight
+      const scoredTasks = incompleteTasks.map(task => {
+        const hoursUntilDeadline = (task.deadline.getTime() - now.getTime()) / (1000 * 60 * 60);
+        const priorityWeight = task.priority === 'high' ? 3 : task.priority === 'medium' ? 2 : 1;
+        const urgencyScore = Math.max(0, 100 - hoursUntilDeadline); // Higher score for sooner deadlines
+
+        return {
+          task,
+          score: urgencyScore * priorityWeight
+        };
+      });
+
+      scoredTasks.sort((a, b) => b.score - a.score);
+      return scoredTasks.length > 0 ? scoredTasks[0].task : null;
+    }
   };
 
-  const markNotificationAsRead = (id: string) => {
-    setNotifications(prev => prev.map(notification => 
-      notification.id === id 
-        ? { ...notification, read: true }
-        : notification
-    ));
+  const markNotificationAsRead = async (id: string) => {
+    try {
+      await apiService.markNotificationAsRead(id);
+      setNotifications(prev => prev.map(notification =>
+        notification.id === id
+          ? { ...notification, read: true }
+          : notification
+      ));
+    } catch (error) {
+      console.error('Failed to mark notification as read:', error);
+      throw error;
+    }
   };
 
-  const clearAllNotifications = () => {
-    setNotifications([]);
+  const clearAllNotifications = async () => {
+    try {
+      await apiService.clearAllNotifications();
+      setNotifications([]);
+    } catch (error) {
+      console.error('Failed to clear notifications:', error);
+      throw error;
+    }
   };
 
   const value: AppContextType = {
