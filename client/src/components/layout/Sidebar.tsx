@@ -99,7 +99,7 @@ export const Sidebar: React.FC = () => {
                 <Target className="w-5 h-5 text-white" />
               </div>
               <span className="font-semibold text-lg text-card-foreground">
-                Smart Todo
+                Task Flow.
               </span>
             </motion.div>
           )}
