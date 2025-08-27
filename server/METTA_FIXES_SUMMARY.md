@@ -193,6 +193,36 @@ test_results = service.test_connection()
 - Update pool size based on usage patterns
 - Monitor for new hyperon library releases
 
+### 6. ✅ Fixed Datetime Timezone Issues
+
+**Status**: COMPLETE
+**Files**: `server/metta_service.py`, `server/fallback_scheduler.py`
+
+**Issue**: Mixing timezone-aware and timezone-naive datetime objects caused:
+- `can't subtract offset-naive and offset-aware datetimes` errors
+- Operation failures in MeTTa service
+
+**Solution**:
+- **Safe datetime comparison utilities** that handle timezone differences
+- **Consistent datetime handling** across all components
+- **Graceful fallback** for datetime comparison errors
+
+**Technical Implementation**:
+```python
+def safe_datetime_comparison(dt1, dt2):
+    """Safely compare two datetime objects, handling timezone differences"""
+    if (dt1.tzinfo is None) == (dt2.tzinfo is None):
+        return dt1 - dt2
+
+    # Make timezone-compatible if needed
+    if dt1.tzinfo is None:
+        dt1 = dt1.replace(tzinfo=timezone.utc)
+    if dt2.tzinfo is None:
+        dt2 = dt2.replace(tzinfo=timezone.utc)
+
+    return dt1 - dt2
+```
+
 ## Summary
 
 The implemented solution provides a **robust, production-ready fix** for the MeTTa BorrowMutError issue through:
@@ -201,6 +231,7 @@ The implemented solution provides a **robust, production-ready fix** for the MeT
 2. **Operational resilience** (fallback systems, retry logic)
 3. **Comprehensive observability** (logging, health checks, metrics)
 4. **Graceful degradation** (automatic fallback activation)
+5. **Data integrity** (timezone-safe datetime handling)
 
 **Result**: The system now handles BorrowMutError gracefully and maintains full functionality even when the underlying Rust library encounters issues.
 
