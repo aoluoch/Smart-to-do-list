@@ -7,10 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { DependencyGraph } from '@/components/DependencyGraph';
+import { Task } from '@/types';
 
 export const Dependencies: React.FC = () => {
   const { tasks } = useApp();
   const [viewMode, setViewMode] = useState<'list' | 'graph'>('list');
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   // Build dependency graph
   const buildDependencyGraph = () => {
@@ -391,28 +394,7 @@ export const Dependencies: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="graph" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Dependency Graph</CardTitle>
-              <CardDescription>
-                Visual representation of task dependencies
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-20 text-muted-foreground">
-                <Network className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                <h3 className="text-lg font-medium mb-2">Graph Visualization</h3>
-                <p className="mb-4">
-                  Interactive dependency graph would be rendered here using a graph visualization library like D3.js or vis.js
-                </p>
-                <div className="text-sm space-y-2">
-                  <p><strong>Nodes:</strong> {nodes.length} tasks</p>
-                  <p><strong>Edges:</strong> {edges.length} dependencies</p>
-                  <p><strong>Critical Path Length:</strong> {criticalPath.length}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <DependencyGraph onTaskSelect={setSelectedTask} />
         </TabsContent>
       </Tabs>
     </div>

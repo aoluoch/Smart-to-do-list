@@ -35,6 +35,12 @@ interface RecommendedTaskResponse {
   task: Task | null;
 }
 
+interface DependencyGraphResponse {
+  nodes: Task[];
+  edges: Array<{ from: string; to: string }>;
+  readyTasks: string[];
+}
+
 class ApiService {
   private token: string | null = null;
 
@@ -238,6 +244,17 @@ class ApiService {
     });
 
     return this.handleResponse<StatsResponse>(response);
+  }
+
+  async getDependencyGraph(): Promise<DependencyGraphResponse> {
+    const response = await fetch(`${API_BASE_URL}/dependencies/graph`, {
+      headers: this.getHeaders(),
+    });
+
+    const data = await this.handleResponse<DependencyGraphResponse>(response);
+    data.nodes = this.convertDates(data.nodes);
+
+    return data;
   }
 
   // Notifications
