@@ -87,8 +87,12 @@ export default {
 			},
 			backgroundImage: {
 				'gradient-primary': 'var(--gradient-primary)',
+				'gradient-blue-purple': 'var(--gradient-blue-purple)',
+				'gradient-blue-green': 'var(--gradient-blue-green)',
 				'gradient-secondary': 'var(--gradient-secondary)',
-				'gradient-success': 'var(--gradient-success)'
+				'gradient-success': 'var(--gradient-success)',
+				'gradient-purple-soft': 'var(--gradient-purple-soft)',
+				'gradient-green-soft': 'var(--gradient-green-soft)'
 			},
 			boxShadow: {
 				'custom-sm': 'var(--shadow-sm)',

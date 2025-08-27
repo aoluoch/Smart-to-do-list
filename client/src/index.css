@@ -24,7 +24,13 @@ Smart To-Do Scheduler Design System with Poppins typography and cobalt blue bran
     --primary: 220 91% 54%;               /* Cobalt Blue #1d4ed8 */
     --primary-foreground: 0 0% 100%;
     --primary-hover: 220 91% 45%;
-    
+
+    /* Accent colors - Purple and Green */
+    --accent-purple: 270 91% 65%;         /* Purple #8b5cf6 */
+    --accent-green: 142 76% 36%;          /* Green #22c55e */
+    --accent-purple-light: 270 91% 85%;
+    --accent-green-light: 142 76% 85%;
+
     /* Secondary colors - light gray */
     --secondary: 210 40% 96%;
     --secondary-foreground: 222 47% 11%;
@@ -63,10 +69,15 @@ Smart To-Do Scheduler Design System with Poppins typography and cobalt blue bran
     --input: 214 32% 91%;
     --ring: 220 91% 54%;
 
-    /* Gradients - Cobalt Blue based */
+    /* Gradients - Multi-color combinations */
     --gradient-primary: linear-gradient(135deg, hsl(220 91% 54%), hsl(220 91% 45%));
+    --gradient-blue-purple: linear-gradient(135deg, hsl(220 91% 54%), hsl(270 91% 65%));
+    --gradient-blue-green: linear-gradient(135deg, hsl(220 91% 54%), hsl(142 76% 36%));
     --gradient-secondary: linear-gradient(135deg, hsl(210 40% 96%), hsl(210 40% 92%));
     --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 30%));
+    --gradient-purple-soft: linear-gradient(135deg, hsl(270 91% 95%), hsl(270 91% 90%));
+    --gradient-green-soft: linear-gradient(135deg, hsl(142 76% 95%), hsl(142 76% 90%));
+    --purple-light: 270 91% 97%;          /* Very light purple for uniform backgrounds */
     
     /* Shadows with cobalt blue tint */
     --shadow-sm: 0 1px 2px 0 hsl(220 91% 54% / 0.1);
@@ -100,6 +111,12 @@ Smart To-Do Scheduler Design System with Poppins typography and cobalt blue bran
     --primary: 220 91% 54%;
     --primary-foreground: 0 0% 100%;
     --primary-hover: 220 91% 45%;
+
+    /* Accent colors - Purple and Green for dark mode */
+    --accent-purple: 270 91% 65%;
+    --accent-green: 142 76% 36%;
+    --accent-purple-light: 270 91% 25%;
+    --accent-green-light: 142 76% 25%;
 
     --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
@@ -145,6 +162,39 @@ Smart To-Do Scheduler Design System with Poppins typography and cobalt blue bran
 @layer base {
   * {
     @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px; /* Account for fixed navbar */
+  }
+
+  /* Enhanced smooth scrolling for sections */
+  div[id] {
+    scroll-margin-top: 80px; /* Account for fixed navbar */
+  }
+
+  /* Smooth transitions for all elements */
+  * {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+
+  /* Active navigation item styling */
+  .nav-item-active {
+    font-weight: 700 !important;
+    color: hsl(var(--primary)) !important;
+    position: relative;
+  }
+
+  .nav-item-active::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--gradient-blue-purple);
+    border-radius: 1px;
   }
 
   body {
