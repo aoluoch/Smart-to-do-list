@@ -74,12 +74,12 @@ export const Calendar: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-card-foreground">Calendar</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-card-foreground">Calendar</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">
             View your tasks in a calendar format and plan your schedule
           </p>
         </div>
@@ -87,12 +87,12 @@ export const Calendar: React.FC = () => {
 
       {/* Calendar Navigation */}
       <Card>
-        <CardHeader>
+        <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-xl">
+            <CardTitle className="text-lg sm:text-xl">
               {format(currentDate, 'MMMM yyyy')}
             </CardTitle>
-            <div className="flex gap-2">
+            <div className="flex gap-1 sm:gap-2">
               <Button
                 variant="outline"
                 size="sm"
@@ -117,13 +117,14 @@ export const Calendar: React.FC = () => {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-3 sm:p-6">
           {/* Calendar Grid */}
-          <div className="grid grid-cols-7 gap-2">
+          <div className="grid grid-cols-7 gap-1 sm:gap-2">
             {/* Day Headers */}
             {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-              <div key={day} className="p-3 text-center text-sm font-medium text-muted-foreground">
-                {day}
+              <div key={day} className="p-2 sm:p-3 text-center text-xs sm:text-sm font-medium text-muted-foreground">
+                <span className="hidden sm:inline">{day}</span>
+                <span className="sm:hidden">{day.charAt(0)}</span>
               </div>
             ))}
 
@@ -142,9 +143,9 @@ export const Calendar: React.FC = () => {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.2, delay: index * 0.01 }}
                   className={`
-                    min-h-[100px] p-2 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md
+                    min-h-[60px] sm:min-h-[100px] p-1 sm:p-2 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md
                     ${isCurrentMonth ? 'bg-card' : 'bg-muted/30'}
-                    ${isToday ? 'ring-2 ring-primary ring-offset-2' : 'border-border'}
+                    ${isToday ? 'ring-1 sm:ring-2 ring-primary ring-offset-1 sm:ring-offset-2' : 'border-border'}
                     ${getDayIntensity(date)}
                     ${dayTasks.length > 0 ? 'hover:scale-105' : ''}
                   `}

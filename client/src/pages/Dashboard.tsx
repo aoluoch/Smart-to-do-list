@@ -24,11 +24,11 @@ const StatCard: React.FC<{
   >
     <Card className="hover:shadow-custom-md transition-shadow">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
+        <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">{title}</CardTitle>
         <Icon className={`w-4 h-4 text-${color}`} />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold text-card-foreground">{value}</div>
+        <div className="text-xl sm:text-2xl font-bold text-card-foreground">{value}</div>
         <p className="text-xs text-muted-foreground flex items-center gap-1">
           {trend && (
             <span className="text-success">
@@ -113,18 +113,19 @@ export const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-card-foreground">Dashboard</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-card-foreground">Dashboard</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">
             Welcome back! Here's what's happening with your tasks.
           </p>
         </div>
-        <Button 
+        <Button
           onClick={() => navigate('/tasks')}
-          className="bg-gradient-primary hover:opacity-90"
+          className="bg-gradient-primary hover:opacity-90 w-full sm:w-auto"
+          size="sm"
         >
           <Target className="w-4 h-4 mr-2" />
           Manage Tasks
@@ -132,7 +133,7 @@ export const Dashboard: React.FC = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <StatCard
           title="Total Tasks"
           value={stats.total}

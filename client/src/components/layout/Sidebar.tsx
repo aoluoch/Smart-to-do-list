@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -52,13 +52,26 @@ const sidebarItems = [
 export const Sidebar: React.FC = () => {
   const { sidebarOpen, setSidebarOpen } = useApp();
   const location = useLocation();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const sidebarVariants = {
     open: {
-      width: '280px',
+      width: isMobile ? '280px' : '280px',
+      x: 0,
     },
     closed: {
-      width: '80px',
+      width: isMobile ? '280px' : '80px',
+      x: isMobile ? '-100%' : 0,
     },
   };
 
@@ -67,7 +80,10 @@ export const Sidebar: React.FC = () => {
       variants={sidebarVariants}
       animate={sidebarOpen ? 'open' : 'closed'}
       transition={{ duration: 0.3, ease: 'easeInOut' }}
-      className="h-screen bg-card border-r border-border shadow-custom-sm flex flex-col fixed left-0 top-0 z-50"
+      className={cn(
+        "h-screen bg-card border-r border-border shadow-custom-sm flex flex-col fixed left-0 top-0",
+        isMobile ? "z-50" : "z-40"
+      )}
     >
       {/* Header */}
       <div className="p-6 border-b border-border">

@@ -94,48 +94,49 @@ export const Landing: React.FC = () => {
       <LandingNavbar />
       
       {/* Hero Section */}
-      <section className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
+      <section className="pt-20 sm:pt-24 pb-12 sm:pb-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground mb-6"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4 sm:mb-6 leading-tight"
             >
               Master Your Tasks,
+              <br className="hidden sm:block" />
               <span className="bg-gradient-primary bg-clip-text text-transparent"> Achieve More</span>
             </motion.h1>
-            
+
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto"
+              className="text-lg sm:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-3xl mx-auto px-4"
             >
-              Transform your productivity with TaskFlow - the intelligent task management system 
+              Transform your productivity with TaskFlow - the intelligent task management system
               that adapts to your workflow and helps you achieve your goals faster.
             </motion.p>
-            
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center max-w-md sm:max-w-none mx-auto"
             >
-              <Button 
+              <Button
                 size="lg"
                 onClick={() => navigate('/register')}
-                className="bg-gradient-primary text-white hover:opacity-90 text-lg px-8 py-3"
+                className="w-full sm:w-auto bg-gradient-primary text-white hover:opacity-90 text-base sm:text-lg px-6 sm:px-8 py-3"
               >
                 Sign Up
-                <ArrowRight className="ml-2 w-5 h-5" />
+                <ArrowRight className="ml-2 w-4 sm:w-5 h-4 sm:h-5" />
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="lg"
                 onClick={() => navigate('/login')}
-                className="text-lg px-8 py-3"
+                className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-3"
               >
                 Sign In
               </Button>
@@ -145,18 +146,18 @@ export const Landing: React.FC = () => {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-16 px-4 sm:px-6 lg:px-8 bg-muted/30">
+      <section id="features" className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 bg-muted/30">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-foreground mb-4">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3 sm:mb-4">
               Everything you need to stay productive
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
               Discover powerful features designed to streamline your workflow and boost your productivity.
             </p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {features.map((feature, index) => (
               <motion.div
                 key={feature.title}
@@ -166,14 +167,14 @@ export const Landing: React.FC = () => {
                 viewport={{ once: true }}
               >
                 <Card className="h-full hover:shadow-lg transition-shadow duration-300">
-                  <CardHeader>
-                    <div className="w-12 h-12 bg-gradient-primary rounded-lg flex items-center justify-center mb-4">
-                      <feature.icon className="w-6 h-6 text-white" />
+                  <CardHeader className="pb-4">
+                    <div className="w-10 sm:w-12 h-10 sm:h-12 bg-gradient-primary rounded-lg flex items-center justify-center mb-3 sm:mb-4">
+                      <feature.icon className="w-5 sm:w-6 h-5 sm:h-6 text-white" />
                     </div>
-                    <CardTitle className="text-xl mb-2">{feature.title}</CardTitle>
+                    <CardTitle className="text-lg sm:text-xl mb-2">{feature.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <CardDescription className="text-base">
+                    <CardDescription className="text-sm sm:text-base">
                       {feature.description}
                     </CardDescription>
                   </CardContent>
