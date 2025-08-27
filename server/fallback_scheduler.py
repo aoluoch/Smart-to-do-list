@@ -4,11 +4,45 @@ Provides alternative task scheduling logic when MeTTa is unavailable
 """
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Dict, Optional, Set
 from models import Task
 
 logger = logging.getLogger(__name__)
+
+
+def get_current_datetime():
+    """Get current datetime that's compatible with Task deadline format"""
+    return datetime.now()
+
+
+def safe_datetime_comparison(dt1, dt2):
+    """Safely compare two datetime objects, handling timezone differences"""
+    # If both have timezone info or both don't, compare directly
+    if (dt1.tzinfo is None) == (dt2.tzinfo is None):
+        return dt1 - dt2
+
+    # If one has timezone and other doesn't, make them compatible
+    if dt1.tzinfo is None:
+        dt1 = dt1.replace(tzinfo=timezone.utc)
+    if dt2.tzinfo is None:
+        dt2 = dt2.replace(tzinfo=timezone.utc)
+
+    return dt1 - dt2
+
+
+def is_task_overdue(task, reference_time=None):
+    """Check if a task is overdue, handling timezone issues"""
+    if reference_time is None:
+        reference_time = get_current_datetime()
+
+    try:
+        diff = safe_datetime_comparison(task.deadline, reference_time)
+        return diff.total_seconds() < 0
+    except Exception as e:
+        logger.warning(f"Error comparing task deadline: {e}")
+        # Fallback to simple comparison
+        return task.deadline < reference_time
 
 
 class FallbackTaskScheduler:
@@ -113,8 +147,13 @@ class FallbackTaskScheduler:
         score += priority_score
         
         # Deadline urgency
-        now = datetime.now()
-        days_until_deadline = (task.deadline - now).days
+        now = get_current_datetime()
+        try:
+            diff = safe_datetime_comparison(task.deadline, now)
+            days_until_deadline = diff.days
+        except Exception as e:
+            logger.warning(f"Error calculating deadline difference: {e}")
+            days_until_deadline = (task.deadline - now).days
         
         if days_until_deadline < 0:
             # Overdue - very high urgency
@@ -196,14 +235,14 @@ class FallbackTaskScheduler:
     def get_task_statistics(self, tasks: List[Task]) -> Dict[str, int]:
         """Get task statistics using fallback logic"""
         try:
-            now = datetime.now()
-            
+            now = get_current_datetime()
+
             stats = {
                 'total': len(tasks),
                 'completed': len([t for t in tasks if t.status == 'completed']),
                 'pending': len([t for t in tasks if t.status == 'pending']),
                 'inProgress': len([t for t in tasks if t.status == 'in-progress']),
-                'overdue': len([t for t in tasks if t.status != 'completed' and t.deadline < now])
+                'overdue': len([t for t in tasks if t.status != 'completed' and is_task_overdue(t, now)])
             }
             
             # Additional insights
@@ -245,7 +284,12 @@ class FallbackTaskScheduler:
                 if task.priority == 'high':
                     reasons.append("High priority task")
                 
-                days_until_deadline = (task.deadline - datetime.now()).days
+                try:
+                    diff = safe_datetime_comparison(task.deadline, get_current_datetime())
+                    days_until_deadline = diff.days
+                except Exception as e:
+                    logger.warning(f"Error calculating deadline for recommendations: {e}")
+                    days_until_deadline = (task.deadline - get_current_datetime()).days
                 if days_until_deadline < 0:
                     reasons.append(f"Overdue by {abs(days_until_deadline)} days")
                 elif days_until_deadline <= 3:

@@ -8,7 +8,7 @@ import json
 import threading
 import time
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Dict, Optional, Any
 from queue import Queue, Empty
 from contextlib import contextmanager
@@ -21,6 +21,40 @@ from fallback_scheduler import FallbackTaskScheduler
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 monitor = get_monitor()
+
+
+def get_current_datetime():
+    """Get current datetime that's compatible with Task deadline format"""
+    return datetime.now()
+
+
+def safe_datetime_comparison(dt1, dt2):
+    """Safely compare two datetime objects, handling timezone differences"""
+    # If both have timezone info or both don't, compare directly
+    if (dt1.tzinfo is None) == (dt2.tzinfo is None):
+        return dt1 - dt2
+
+    # If one has timezone and other doesn't, make them compatible
+    if dt1.tzinfo is None:
+        dt1 = dt1.replace(tzinfo=timezone.utc)
+    if dt2.tzinfo is None:
+        dt2 = dt2.replace(tzinfo=timezone.utc)
+
+    return dt1 - dt2
+
+
+def is_task_overdue(task, reference_time=None):
+    """Check if a task is overdue, handling timezone issues"""
+    if reference_time is None:
+        reference_time = get_current_datetime()
+
+    try:
+        diff = safe_datetime_comparison(task.deadline, reference_time)
+        return diff.total_seconds() < 0
+    except Exception as e:
+        logger.warning(f"Error comparing task deadline: {e}")
+        # Fallback to simple comparison
+        return task.deadline < reference_time
 
 
 class MeTTaConnectionPool:
@@ -265,9 +299,14 @@ class MeTTaSchedulerService:
     
     def _calculate_days_difference(self, deadline: datetime) -> int:
         """Calculate days until deadline"""
-        now = datetime.now()
-        diff = deadline - now
-        return max(0, diff.days)
+        now = get_current_datetime()
+        try:
+            diff = safe_datetime_comparison(deadline, now)
+            return max(0, diff.days)
+        except Exception as e:
+            logger.warning(f"Error calculating days difference: {e}")
+            # Fallback calculation
+            return max(0, (deadline - now).days)
     
     def _add_dynamic_date_functions_operation(self, metta: MeTTa, tasks: List[Task]):
         """Add dynamic date difference functions to MeTTa based on actual task deadlines"""
@@ -442,12 +481,13 @@ class MeTTaSchedulerService:
         result = metta.run("(getTaskStats)")
 
         # Default statistics
+        now = get_current_datetime()
         stats = {
             'total': len(tasks),
             'completed': len([t for t in tasks if t.status == 'completed']),
             'pending': len([t for t in tasks if t.status == 'pending']),
             'inProgress': len([t for t in tasks if t.status == 'in-progress']),
-            'overdue': len([t for t in tasks if t.status != 'completed' and t.deadline < datetime.now()])
+            'overdue': len([t for t in tasks if t.status != 'completed' and is_task_overdue(t, now)])
         }
 
         # If MeTTa returns statistics, use those instead
@@ -471,12 +511,13 @@ class MeTTaSchedulerService:
                 return self.fallback_scheduler.get_task_statistics(tasks)
 
             # Return basic statistics as final fallback
+            now = get_current_datetime()
             return {
                 'total': len(tasks),
                 'completed': len([t for t in tasks if t.status == 'completed']),
                 'pending': len([t for t in tasks if t.status == 'pending']),
                 'inProgress': len([t for t in tasks if t.status == 'in-progress']),
-                'overdue': len([t for t in tasks if t.status != 'completed' and t.deadline < datetime.now()])
+                'overdue': len([t for t in tasks if t.status != 'completed' and is_task_overdue(t, now)])
             }
 
     def get_health_status(self) -> Dict[str, Any]:
@@ -514,7 +555,7 @@ class MeTTaSchedulerService:
         """Export diagnostic information to file"""
         try:
             if not filepath:
-                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                timestamp = get_current_datetime().strftime("%Y%m%d_%H%M%S")
                 filepath = f"logs/metta_diagnostics_{timestamp}.json"
 
             monitor.export_metrics(filepath)
@@ -557,7 +598,7 @@ class MeTTaSchedulerService:
                     id="test",
                     title="Test Task",
                     description="Test",
-                    deadline=datetime.now() + timedelta(days=1),
+                    deadline=get_current_datetime() + timedelta(days=1),
                     priority="medium",
                     duration=60,
                     status="pending"
