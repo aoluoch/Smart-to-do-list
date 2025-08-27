@@ -73,8 +73,6 @@ export const Login: React.FC = () => {
           >
             <Target className="w-7 sm:w-8 h-7 sm:h-8 text-white" />
           </motion.div>
-          <h1 className="text-xl sm:text-2xl font-bold text-card-foreground">TaskFlow</h1>
-          <p className="text-sm sm:text-base text-muted-foreground mt-2">Intelligent task management</p>
         </div>
 
         <Card className="shadow-custom-lg border-0">
