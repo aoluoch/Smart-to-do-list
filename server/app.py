@@ -4,6 +4,7 @@ Main application file with all API endpoints
 """
 
 import os
+import sys
 import uuid
 from datetime import datetime, timedelta
 from flask import Flask, request, jsonify
@@ -24,12 +25,12 @@ app = Flask(__name__)
 # Configuration
 app.config['SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'dev-secret-key')
 
-# Database configuration with fallback
+# Database configuration - PostgreSQL required
 database_url = os.getenv('DATABASE_URL')
-# if not database_url:
-#     print("⚠️  WARNING: DATABASE_URL not found in environment variables!")
-#     print("⚠️  Falling back to SQLite for development")
-#     database_url = 'sqlite:///smart_todo.db'
+if not database_url:
+    print("❌ ERROR: DATABASE_URL not found in environment variables!")
+    print("❌ Please set DATABASE_URL in your .env file")
+    sys.exit(1)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

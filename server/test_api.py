@@ -3,6 +3,7 @@ Comprehensive test suite for Smart To-Do Scheduler API
 Tests all endpoints and functionality
 """
 
+import os
 import pytest
 import json
 import uuid
@@ -14,7 +15,9 @@ from app import app, db, User, Task, Notification
 def client():
     """Create test client"""
     app.config['TESTING'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+    # Use PostgreSQL for testing - requires test database setup
+    test_db_url = os.getenv('TEST_DATABASE_URL', 'postgresql://test_user:test_pass@localhost:5432/test_smart_todo')
+    app.config['SQLALCHEMY_DATABASE_URI'] = test_db_url
     app.config['JWT_SECRET_KEY'] = 'test-secret-key'
     
     with app.test_client() as client:

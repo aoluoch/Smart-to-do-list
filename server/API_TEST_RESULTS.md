@@ -2,7 +2,7 @@
 
 ## Database Population ✅
 
-Successfully populated SQLite database with sample data:
+Successfully populated PostgreSQL database with sample data:
 
 ### Sample Users (All with password: "password")
 1. **Alex Johnson** - alex.johnson@example.com (8h work capacity)
@@ -130,7 +130,7 @@ Successfully tested user isolation:
 ## Server Status
 - **Server URL**: http://localhost:5000
 - **Status**: Running and responsive
-- **Database**: SQLite with sample data populated
+- **Database**: PostgreSQL with sample data populated
 - **All endpoints**: Functional and tested
 
 ## Testing Commands Used

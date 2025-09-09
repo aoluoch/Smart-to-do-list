@@ -15,7 +15,7 @@ The backend for the Smart To-Do Scheduler has been successfully implemented and 
 
 ### 2. **Database Layer**
 - **SQLAlchemy ORM** with proper models
-- **SQLite database** (development) with PostgreSQL support
+- **PostgreSQL database** for all environments
 - **Database migrations** support
 - **Sample data** for testing and development
 - **Proper relationships** between users, tasks, and notifications
@@ -119,7 +119,7 @@ The server runs on `http://localhost:5000`
 ### Environment Variables (.env)
 ```env
 FLASK_ENV=development
-DATABASE_URL=sqlite:///smart_todo.db
+DATABASE_URL=postgresql://username:password@localhost:5432/smart_todo
 JWT_SECRET_KEY=dev-secret-key
 CORS_ORIGINS=http://localhost:8080
 PORT=5000
@@ -202,7 +202,6 @@ server/
 ├── test_manual.py        # Manual testing
 ├── .env                  # Environment config
 ├── scheduler.metta       # MeTTa knowledge base
-├── smart_todo.db         # SQLite database
 └── README.md             # Documentation
 ```
 

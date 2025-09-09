@@ -19,9 +19,11 @@ def start_production_server():
         print("❌ ERROR: DATABASE_URL not found in environment!")
         sys.exit(1)
 
-    if not database_url.startswith("postgresql"):
+    # Check if it's a PostgreSQL URL (including postgres:// variant)
+    if not (database_url.startswith("postgresql://") or database_url.startswith("postgres://")):
         print(f"❌ ERROR: Unsupported database URL -> {database_url}")
         print("   Only PostgreSQL is supported in production.")
+        print("   URL should start with 'postgresql://' or 'postgres://'")
         sys.exit(1)
 
     print("🗄️  Database: PostgreSQL")

@@ -174,8 +174,8 @@ curl -X POST http://localhost:5000/api/auth/login \
 Copy `server/.env.example` to `server/.env` and configure:
 
 ```env
-# Database
-DATABASE_URL=sqlite:///smart_todo.db
+# Database - PostgreSQL required
+DATABASE_URL=postgresql://username:password@localhost:5432/smart_todo
 
 # JWT Security
 JWT_SECRET_KEY=your-super-secret-key
@@ -189,16 +189,18 @@ HOST=0.0.0.0
 PORT=5000
 ```
 
-### Database Options
+### Database Configuration
 
-**SQLite (Development):**
+The application requires PostgreSQL for all environments:
+
+**Local PostgreSQL:**
 ```env
-DATABASE_URL=sqlite:///smart_todo.db
+DATABASE_URL=postgresql://username:password@localhost:5432/smart_todo
 ```
 
-**PostgreSQL (Production):**
+**Cloud PostgreSQL:**
 ```env
-DATABASE_URL=postgresql://username:password@localhost/smart_todo
+DATABASE_URL=postgresql://user:pass@host:port/database
 ```
 
 ## 🤖 MeTTa AI Integration

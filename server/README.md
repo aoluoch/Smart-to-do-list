@@ -10,7 +10,7 @@ A Flask-based REST API backend with AI-powered task scheduling using MeTTa reaso
 - **Dependency Management** with circular dependency detection and resolution
 - **Real-time Notifications** for task updates, deadlines, and completion alerts
 - **Comprehensive Testing** with automated test suites (16 tests, 100% coverage)
-- **Database Migrations** with SQLAlchemy ORM and PostgreSQL/SQLite support
+- **Database Migrations** with SQLAlchemy ORM and PostgreSQL support
 - **Health Monitoring** with dedicated health check endpoints
 - **CORS Support** for cross-origin requests from frontend applications
 
@@ -42,7 +42,7 @@ python start_server.py init
    This automatically:
    - ✅ Installs all Python dependencies
    - ✅ Creates `.env` configuration file
-   - ✅ Initializes SQLite database
+   - ✅ Initializes PostgreSQL database
    - ✅ Populates sample data (5 users, 10+ tasks)
    - ✅ Verifies MeTTa AI integration
 
@@ -163,7 +163,7 @@ FLASK_ENV=development  # or 'production'
 FLASK_DEBUG=True
 
 # 🗄️ Database Configuration
-DATABASE_URL=sqlite:///smart_todo.db
+DATABASE_URL=postgresql://username:password@localhost:5432/smart_todo
 
 # 🔐 JWT Security
 JWT_SECRET_KEY=your-super-secret-jwt-key-change-in-production
@@ -180,17 +180,22 @@ PORT=5000
 METTA_SCHEDULER_FILE=scheduler.metta
 ```
 
-### Database Options
+### Database Configuration
 
-| Environment | Configuration |
-|-------------|---------------|
-| **Development** | `DATABASE_URL=sqlite:///smart_todo.db` |
-| **Production** | `DATABASE_URL=postgresql://user:pass@host/db` |
+The application requires PostgreSQL for all environments:
+
+```env
+DATABASE_URL=postgresql://username:password@localhost:5432/smart_todo
+```
+
+**Examples:**
+- **Local PostgreSQL:** `postgresql://user:pass@localhost:5432/smart_todo`
+- **Cloud PostgreSQL:** `postgresql://user:pass@host:port/database`
 
 ### Security Notes
 - 🔑 **Change `JWT_SECRET_KEY`** in production
 - 🌐 **Update `CORS_ORIGINS`** for your frontend URL
-- 🔒 **Use PostgreSQL** for production deployments
+- 🗄️ **PostgreSQL is required** for all environments
 
 ## Database Management
 
@@ -270,7 +275,7 @@ FLASK_ENV=development  # or 'production'
 FLASK_DEBUG=True
 
 # 🗄️ Database Configuration
-DATABASE_URL=sqlite:///smart_todo.db
+DATABASE_URL=postgresql://username:password@localhost:5432/smart_todo
 
 # 🔐 JWT Security
 JWT_SECRET_KEY=your-super-secret-jwt-key-change-in-production
@@ -291,8 +296,7 @@ METTA_SCHEDULER_FILE=scheduler.metta
 
 | Environment | Configuration |
 |-------------|---------------|
-| **Development** | `DATABASE_URL=sqlite:///smart_todo.db` |
-| **Production** | `DATABASE_URL=postgresql://user:pass@host/db` |
+| **All Environments** | `DATABASE_URL=postgresql://user:pass@host:port/db` |
 
 ### Security Notes
 - 🔑 **Change `JWT_SECRET_KEY`** in production

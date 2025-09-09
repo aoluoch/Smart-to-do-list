@@ -26,7 +26,7 @@ def on_starting(server):
     """Called just before the master process is initialized."""
     database_url = os.getenv('DATABASE_URL')
     if database_url:
-        db_type = 'PostgreSQL' if database_url.startswith('postgresql') else 'SQLite' if database_url.startswith('sqlite') else 'Other'
+        db_type = 'PostgreSQL' if (database_url.startswith('postgresql') or database_url.startswith('postgres')) else 'Other'
         server.log.info(f"🗄️  Database: {db_type}")
         server.log.info(f"🗄️  Database URL: {database_url[:50]}{'...' if len(database_url) > 50 else ''}")
     else:
