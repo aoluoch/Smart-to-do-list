@@ -23,8 +23,19 @@ app = Flask(__name__)
 
 # Configuration
 app.config['SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'dev-secret-key')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+
+# Database configuration with fallback
+database_url = os.getenv('DATABASE_URL')
+# if not database_url:
+#     print("⚠️  WARNING: DATABASE_URL not found in environment variables!")
+#     print("⚠️  Falling back to SQLite for development")
+#     database_url = 'sqlite:///smart_todo.db'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Debug: Print database configuration
+print(f"🗄️  Database URL: {database_url[:50]}{'...' if len(database_url) > 50 else ''}")
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'dev-secret-key')
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(seconds=int(os.getenv('JWT_ACCESS_TOKEN_EXPIRES', 3600)))
 
